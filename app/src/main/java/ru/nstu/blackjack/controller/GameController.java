@@ -112,14 +112,6 @@ public class GameController {
         validateChangeBetButtons();
     }
 
-    private void validateChangeBetButtons() {
-        boolean canIncrement = interactor.canIncrement(pendingBet, game.getMyMoney());
-        view.enableIncrementButton(canIncrement);
-
-        boolean canDecrement = interactor.canDecrement(pendingBet, game.getMyMoney());
-        view.enableDecrementButton(canDecrement);
-    }
-
     public void onDestroy() {
         settings.edit()
                 .putLong("getMyMoney", game.getMyMoney())
@@ -133,5 +125,16 @@ public class GameController {
 
     public void onClickBet() {
         player.initialBet(pendingBet);
+    }
+
+    private void validateChangeBetButtons() {
+        boolean canIncrement = interactor.canIncrement(pendingBet, game.getMyMoney());
+        view.enableIncrementButton(canIncrement);
+
+        boolean canDecrement = interactor.canDecrement(pendingBet, game.getMyMoney());
+        view.enableDecrementButton(canDecrement);
+
+        boolean canMakeBet = interactor.canMakeBet(pendingBet, game.getMyMoney());
+        view.enableMakeBetButton(canMakeBet);
     }
 }

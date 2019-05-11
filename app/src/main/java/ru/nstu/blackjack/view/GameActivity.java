@@ -60,11 +60,13 @@ public class GameActivity extends AppCompatActivity {
     TextView handOverTextView;
 
     @BindView(R.id.button_bet)
-    Button betButton;
+    Button buttonMakeBet;
+
     @BindView(R.id.button_increment_bet)
     Button buttonIncrementBet;
     @BindView(R.id.button_decrement_bet)
     Button buttonDecrementBet;
+
     @BindView(R.id.button_double)
     Button doubleButton;
     @BindView(R.id.button_split)
@@ -138,7 +140,7 @@ public class GameActivity extends AppCompatActivity {
         }
         buttonDecrementBet.setText(getString(R.string.decrement_bet, decrementAmount));
         buttonDecrementBet.setEnabled(bet != 0);
-        betButton.setEnabled(bet != 0);
+        buttonMakeBet.setEnabled(bet != 0);
 
         long incrementAmount;
         if (bet > controller.game.getMyMoney() - 100 && bet != controller.game.getMyMoney()) {
@@ -362,5 +364,9 @@ public class GameActivity extends AppCompatActivity {
 
     public void enableDecrementButton(boolean canDecrement) {
         buttonDecrementBet.setEnabled(canDecrement);
+    }
+
+    public void enableMakeBetButton(boolean canMakeBet) {
+        buttonMakeBet.setEnabled(canMakeBet);
     }
 }

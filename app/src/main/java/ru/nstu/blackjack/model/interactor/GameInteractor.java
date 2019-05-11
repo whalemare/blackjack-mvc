@@ -23,4 +23,8 @@ public class GameInteractor {
     public boolean canDecrement(long bet, long myMoney) {
         return bet != 0 && myMoney >= bet;
     }
+
+    public boolean canMakeBet(long pendingBet, long myMoney) {
+        return pendingBet != 0 && pendingBet <= myMoney;
+    }
 }
