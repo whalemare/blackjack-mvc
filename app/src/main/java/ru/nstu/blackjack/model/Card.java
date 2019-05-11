@@ -36,7 +36,7 @@ public class Card implements Serializable {
     public String toString() {
         String rankString = rank.toString().toLowerCase();
         String suitString = suit.toString().toLowerCase();
-        return String.format(Locale.US, "%s of %s", rank, suit);
+        return String.format(Locale.US, "%s of %s", rankString, suitString);
     }
 
     int value() {

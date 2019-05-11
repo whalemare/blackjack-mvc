@@ -125,10 +125,10 @@ public class GameController {
         game.getMe().initialBet(pendingBet);
         game.getMe().takeMoney(pendingBet);
 
-        game.getDealer().getHand().add(game.getDeck().nextCard());
-        game.getMe().getHand().add(game.getDeck().nextCard());
-        game.getDealer().getHand().add(game.getDeck().nextCard());
-        game.getMe().getHand().add(game.getDeck().nextCard());
+        game.getDealer().getHand().addCard(game.getDeck().nextCard());
+        game.getMe().getHand().addCard(game.getDeck().nextCard());
+        game.getDealer().getHand().addCard(game.getDeck().nextCard());
+        game.getMe().getHand().addCard(game.getDeck().nextCard());
 
         game.getMe().checkBlackjack();
         game.checkDealerBlackjack();
@@ -150,7 +150,7 @@ public class GameController {
     }
 
     public void onClickHit() {
-        game.getMe().getHand().add(game.getDeck().nextCard());
+        game.getMe().getHand().addCard(game.getDeck().nextCard());
         if (interactor.isGameEnd(game)) {
             game.getMe().endHand();
         }

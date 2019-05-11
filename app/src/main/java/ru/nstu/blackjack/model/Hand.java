@@ -31,9 +31,9 @@ public class Hand implements Serializable, Iterable<Card> {
         return new ArrayList<>(cards);
     }
 
-    public void add(Card card) {
+    public void addCard(Card card) {
         cards.add(card);
-        events.onNext("card added");
+        events.onNext("card added " + card.toString());
     }
 
     public int size() {
@@ -42,7 +42,7 @@ public class Hand implements Serializable, Iterable<Card> {
 
     @Deprecated
     public void draw(Card card) {
-        add(card);
+        addCard(card);
     }
 
     public Card removeLastCard() {

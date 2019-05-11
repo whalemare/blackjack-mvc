@@ -59,9 +59,9 @@ class DealerHand extends Hand {
         }
     }
 
-    void drawUpToSeventeen(Deck deck) {
-        while (score() < 17) {
-            add(deck.nextCard());
+    void takeWhileLower(Deck deck, int value) {
+        while (score() < value) {
+            addCard(deck.nextCard());
         }
     }
 }

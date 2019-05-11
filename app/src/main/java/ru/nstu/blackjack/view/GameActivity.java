@@ -240,7 +240,7 @@ public class GameActivity extends AppCompatActivity {
             ImageView cardImageView = (ImageView) playerHandView.getChildAt(i);
             setCardForImageView(cards.get(i), cardImageView);
         }
-        // add any missing views
+        // addCard any missing views
         for (int i = playerHandView.getChildCount(); i < cards.size(); i++) {
             setCardForImageView(cards.get(i), newImageViewForLayout(playerHandView));
         }
