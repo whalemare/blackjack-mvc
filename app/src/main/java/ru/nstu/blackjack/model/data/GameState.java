@@ -1,4 +1,4 @@
-package ru.nstu.blackjack.model;
+package ru.nstu.blackjack.model.data;
 
 import java.util.List;
 

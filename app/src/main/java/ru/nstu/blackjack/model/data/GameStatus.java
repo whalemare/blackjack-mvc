@@ -1,4 +1,4 @@
-package ru.nstu.blackjack.model;
+package ru.nstu.blackjack.model.data;
 
 public enum GameStatus {
     /**
@@ -13,6 +13,13 @@ public enum GameStatus {
      */
     HITTING,
 
+    /**
+     * Ожидание
+     */
     WAITING,
+
+    /**
+     * Демонстрация карт и подсчет очков
+     */
     SHOWDOWN
 }

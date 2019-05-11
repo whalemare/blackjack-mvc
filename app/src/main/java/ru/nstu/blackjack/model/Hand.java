@@ -8,6 +8,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
+import ru.nstu.blackjack.model.data.Card;
 
 /**
  * Representation of a hand of playing cards

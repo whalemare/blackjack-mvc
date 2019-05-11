@@ -32,9 +32,9 @@ import butterknife.Unbinder;
 import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
-import ru.nstu.blackjack.model.Card;
+import ru.nstu.blackjack.model.data.Card;
 import ru.nstu.blackjack.model.GameData;
-import ru.nstu.blackjack.model.GameStatus;
+import ru.nstu.blackjack.model.data.GameStatus;
 import ru.nstu.blackjack.model.Player;
 
 public class GameActivity extends AppCompatActivity {

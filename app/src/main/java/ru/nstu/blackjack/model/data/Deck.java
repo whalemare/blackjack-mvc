@@ -1,4 +1,4 @@
-package ru.nstu.blackjack.model;
+package ru.nstu.blackjack.model.data;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -17,7 +17,7 @@ public class Deck implements Serializable {
     }
 
     @Deprecated
-    void shuffle() {
+    public void shuffle() {
         Collections.shuffle(cards, new Random());
     }
 }

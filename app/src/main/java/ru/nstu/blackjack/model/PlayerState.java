@@ -2,6 +2,9 @@ package ru.nstu.blackjack.model;
 
 import java.util.List;
 
+import ru.nstu.blackjack.model.data.Card;
+import ru.nstu.blackjack.model.data.GameStatus;
+
 /**
  * Created by bryancapps on 12/27/16.
  */

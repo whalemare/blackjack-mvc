@@ -6,6 +6,8 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
+import ru.nstu.blackjack.model.data.Card;
+import ru.nstu.blackjack.model.data.Deck;
 
 /**
  * Created by bryancapps on 12/22/16.
@@ -39,7 +41,7 @@ public class DealerHand extends Hand {
         } else {
             Card firstCard = super.cards().get(0);
             int score = score() + firstCard.value();
-            if (score <= 11 && firstCard.rank == Card.Rank.ACE) {
+            if (score <= 11 && firstCard.getRank() == Card.Rank.ACE) {
                 score = score + 10;
             }
             return score;

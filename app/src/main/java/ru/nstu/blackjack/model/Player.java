@@ -7,6 +7,9 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
+import ru.nstu.blackjack.model.data.Card;
+import ru.nstu.blackjack.model.data.GameOutcomeStatus;
+import ru.nstu.blackjack.model.data.GameStatus;
 
 public class Player implements Serializable {
     @Deprecated
@@ -74,20 +77,12 @@ public class Player implements Serializable {
         return hand.score();
     }
 
-    // called only on initial bet, not called after split for new hands
+    /**
+     * Вызывается только для начальной ставки
+     */
     public void initialBet(long bet) {
         setStatus(GameStatus.HITTING);
         setBet(bet);
-    }
-
-    public void checkBlackjack() {
-        if(hand.score() == 21 && hand.size() == 2) {
-            endHand();
-        }
-    }
-
-    public void stay() {
-        endHand();
     }
 
     public void endHand() {
@@ -96,10 +91,6 @@ public class Player implements Serializable {
             game.showdown();
         }
     }
-
-    //endregion
-
-    //region Hand Outcome
 
     public long winnings() {
         switch (outcome()) {
@@ -119,7 +110,7 @@ public class Player implements Serializable {
         }
     }
 
-    public GameOutcome outcome() {
+    public GameOutcomeStatus outcome() {
         int playerScore = hand.score();
         int dealerScore = game.getDealer().getHand().score();
         int nPlayerCards = hand.size();
@@ -127,27 +118,27 @@ public class Player implements Serializable {
 
         if (dealerScore == playerScore && dealerScore <= 21) {
             // push
-            return GameOutcome.PUSH;
+            return GameOutcomeStatus.PUSH;
         } else if (playerScore == 21 && nPlayerCards == 2) {
             // player has a blackjack!
-            return GameOutcome.PLAYER_BLACKJACK;
+            return GameOutcomeStatus.PLAYER_BLACKJACK;
         } else if (dealerScore == 21 && nDealerCards == 2) {
             // dealer has a blackjack
-            return GameOutcome.DEALER_BLACKJACK;
+            return GameOutcomeStatus.DEALER_BLACKJACK;
         } else if (playerScore > dealerScore && playerScore <= 21) {
             // player wins!
-            return GameOutcome.PLAYER_WIN;
+            return GameOutcomeStatus.PLAYER_WIN;
         } else if (playerScore <= 21 && dealerScore > 21) {
             // dealer busts!
-            return GameOutcome.DEALER_BUST;
+            return GameOutcomeStatus.DEALER_BUST;
         } else if (dealerScore > playerScore && dealerScore <= 21) {
             // dealer wins
-            return GameOutcome.DEALER_WIN;
+            return GameOutcomeStatus.DEALER_WIN;
         } else if (playerScore > 21) {
             // player busts
-            return GameOutcome.PLAYER_BUST;
+            return GameOutcomeStatus.PLAYER_BUST;
         }
-        return GameOutcome.ERROR;
+        return GameOutcomeStatus.ERROR;
     }
 
     public long getMoney() {
@@ -163,7 +154,5 @@ public class Player implements Serializable {
         money -= value;
         publishState();
     }
-
-    //endregion
 
 }

@@ -9,10 +9,10 @@ import java.util.Collections;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import ru.nstu.blackjack.model.Deck;
+import ru.nstu.blackjack.model.data.Deck;
 import ru.nstu.blackjack.model.GameData;
-import ru.nstu.blackjack.model.GameState;
-import ru.nstu.blackjack.model.GameStatus;
+import ru.nstu.blackjack.model.data.GameState;
+import ru.nstu.blackjack.model.data.GameStatus;
 import ru.nstu.blackjack.model.PlayerState;
 import ru.nstu.blackjack.model.interactor.GameInteractor;
 import ru.nstu.blackjack.view.GameActivity;
@@ -157,7 +157,7 @@ public class GameController {
     }
 
     public void onClickStay() {
-        game.getMe().stay();
+        game.getMe().endHand();
     }
 
     public void onDestroy() {

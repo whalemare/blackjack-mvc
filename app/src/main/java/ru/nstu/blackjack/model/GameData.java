@@ -7,6 +7,9 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
+import ru.nstu.blackjack.model.data.Deck;
+import ru.nstu.blackjack.model.data.GameState;
+import ru.nstu.blackjack.model.data.GameStatus;
 import ru.nstu.blackjack.utils.Utils;
 
 public class GameData implements Serializable {

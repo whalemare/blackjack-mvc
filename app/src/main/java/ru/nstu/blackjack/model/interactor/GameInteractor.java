@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ru.nstu.blackjack.model.Card;
+import ru.nstu.blackjack.model.data.Card;
 import ru.nstu.blackjack.model.DealerHand;
 import ru.nstu.blackjack.model.GameData;
 import ru.nstu.blackjack.model.Hand;
@@ -51,7 +51,7 @@ public class GameInteractor {
             if (rank == Card.Rank.BLANK) continue;
             for (Card.Suit suit : Card.Suit.values()) {
                 if (suit == Card.Suit.DEALER || suit == Card.Suit.PLAYER) continue;
-                cards.add(Card.create(rank, suit));
+                cards.add(new Card(rank, suit));
             }
         }
         Collections.shuffle(cards);
