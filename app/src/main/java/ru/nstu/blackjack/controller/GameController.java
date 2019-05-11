@@ -3,8 +3,17 @@ package ru.nstu.blackjack.controller;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.model.Game;
+import ru.nstu.blackjack.model.GameState;
+import ru.nstu.blackjack.model.GameStatus;
 import ru.nstu.blackjack.model.Player;
+import ru.nstu.blackjack.model.PlayerState;
 import ru.nstu.blackjack.view.GameActivity;
 
 /**
@@ -19,6 +28,8 @@ public class GameController {
     private final SharedPreferences settings;
     public Game game;
     public Player player;
+    private ArrayList<Object> disposables;
+    private CompositeDisposable disposable;
 
     public GameController(GameActivity view) {
         this.view = view;
@@ -31,6 +42,58 @@ public class GameController {
         game.setMoney(settings.getLong("money", DEFAULT_MONEY));
         this.player = game.newPlayer();
         view.startGame(game, player);
+
+        Disposable listsOfPlayers = game.getObservable()
+                .map(GameState::getPlayerCount)
+                .distinctUntilChanged()
+                .map(count -> game.players())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::showPlayers);
+
+        Disposable noMoney = game.players()
+                .get(0)
+                .getObservable()
+                .map(PlayerState::getStatus)
+                .filter(status -> status == GameStatus.BETTING && game.money() <= 0)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(status -> view.showResetGameDialog(DEFAULT_MONEY));
+
+        Disposable dealerHands = game.getObservable()
+                .map(GameState::getDealerCards)
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::showDealerCards);
+
+        Disposable monies = game.getObservable()
+                .map(GameState::getMoney)
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::showMoney);
+
+        Disposable playerHands = player.getObservable()
+                .map(PlayerState::getCards)
+                .distinctUntilChanged()
+                .filter(cards -> cards.size() != 1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::showPlayerCards);
+
+        Disposable bets = player.getObservable()
+                .map(PlayerState::getBet)
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::showBet);
+
+        Disposable statuses = player.getObservable()
+                .map(PlayerState::getStatus)
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::showDecisionView);
+
+        disposables = new ArrayList<>();
+        disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);
+        Collections.addAll(disposables, listsOfPlayers, noMoney);
+
+        view.showMoney(game.money());
     }
 
 

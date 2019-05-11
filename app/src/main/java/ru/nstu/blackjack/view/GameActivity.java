@@ -29,17 +29,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
 import ru.nstu.blackjack.model.Card;
 import ru.nstu.blackjack.model.Game;
-import ru.nstu.blackjack.model.GameState;
 import ru.nstu.blackjack.model.GameStatus;
 import ru.nstu.blackjack.model.Player;
-import ru.nstu.blackjack.model.PlayerState;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -114,65 +111,20 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void startGame(Game game, Player player) {
-        disposables = new ArrayList<>();
-        Disposable listsOfPlayers = game.getObservable()
-                .map(GameState::getPlayerCount)
-                .distinctUntilChanged()
-                .map(count -> game.players())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showPlayers);
 
-        Disposable noMoney = game.players().get(0).getObservable()
-                .map(PlayerState::getStatus)
-                .filter(status -> status == GameStatus.BETTING && game.money() <= 0)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(status -> showMoneyDialog(1000));
-
-        Disposable dealerHands = game.getObservable()
-                .map(GameState::getDealerCards)
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showDealerCards);
-
-        Disposable monies = game.getObservable()
-                .map(GameState::getMoney)
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showMoney);
-        Disposable playerHands = player.getObservable()
-                .map(PlayerState::getCards)
-                .distinctUntilChanged()
-                .filter(cards -> cards.size() != 1)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showPlayerCards);
-        Disposable bets = player.getObservable()
-                .map(PlayerState::getBet)
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showBet);
-        Disposable statuses = player.getObservable()
-                .map(PlayerState::getStatus)
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showDecisionView);
-
-        disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);
-
-        Collections.addAll(disposables, listsOfPlayers, noMoney);
-        showMoney(game.money());
     }
 
-    private void showPlayers(List<Player> players) {
+    public void showPlayers(List<Player> players) {
         Log.d("GAME", "showPlayers: " + players.toString());
     }
 
-    private void showMoneyDialog(final int dollars) {
+    public void showResetGameDialog(final int dollars) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false)
-                .setTitle("Need more money?")
+                .setTitle("Закончились деньги")
                 .setMessage(String.format(Locale.US,
-                        "Press OK to start over with another $%d", dollars))
-                .setPositiveButton("OK", (dialog, which) -> controller.game.setMoney(dollars))
+                        "Но вы можете попробовать снова, начав с $%d", dollars))
+                .setPositiveButton("Начать", (dialog, which) -> controller.game.setMoney(dollars))
                 .show();
     }
 
@@ -233,7 +185,7 @@ public class GameActivity extends AppCompatActivity {
         controller.onClickBet(getPendingBet());
     }
 
-    private void showBet(long bet) {
+    public void showBet(long bet) {
         bigBetView.setText(getString(R.string.current_bet, bet));
     }
 
@@ -300,7 +252,7 @@ public class GameActivity extends AppCompatActivity {
 
     //region Hand Views
 
-    private void showDealerCards(List<Card> cards) {
+    public void showDealerCards(List<Card> cards) {
         TransitionManager.beginDelayedTransition(dealerHandView, transitionSet);
         if (controller.player.status() == GameStatus.BETTING) {
             dealerHandView.removeAllViews();
@@ -322,7 +274,7 @@ public class GameActivity extends AppCompatActivity {
         dealerScoreTextView.setText(String.valueOf(controller.game.dealerScore()));
     }
 
-    private void showPlayerCards(List<Card> cards) {
+    public void showPlayerCards(List<Card> cards) {
         TransitionManager.beginDelayedTransition(playerHandView, transitionSet);
 
         if (controller.player.status() == GameStatus.BETTING) {
@@ -385,7 +337,7 @@ public class GameActivity extends AppCompatActivity {
         controller.onClickPlayAgain();
     }
 
-    private void showDecisionView(GameStatus status) {
+    public void showDecisionView(GameStatus status) {
         if (status == GameStatus.BETTING) {
             hitAndStayView.setVisibility(View.GONE);
             waitingView.setVisibility(View.GONE);

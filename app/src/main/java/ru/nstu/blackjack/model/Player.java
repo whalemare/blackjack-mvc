@@ -43,14 +43,6 @@ public class Player implements Serializable {
         setStatus(GameStatus.BETTING);
     }
 
-    public Game game() {
-        return game;
-    }
-
-    public Hand hand() {
-        return hand;
-    }
-
     public long getBet() {
         return bet;
     }
