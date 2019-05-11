@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import ru.nstu.blackjack.model.Game;
+import ru.nstu.blackjack.model.Player;
 import ru.nstu.blackjack.view.GameActivity;
 
 /**
@@ -17,17 +18,19 @@ public class GameController {
     private final GameActivity view;
     private final SharedPreferences settings;
     public Game game;
+    public Player player;
 
     public GameController(GameActivity view) {
         this.view = view;
-        this.game = new Game();
         this.settings = view.getPreferences(Context.MODE_PRIVATE);
         setup();
     }
 
     private void setup() {
+        this.game = new Game();
         game.setMoney(settings.getLong("money", DEFAULT_MONEY));
-        view.startGame(game);
+        this.player = game.newPlayer();
+        view.startGame(game, player);
     }
 
 
@@ -35,5 +38,14 @@ public class GameController {
         settings.edit()
                 .putLong("money", game.money())
                 .apply();
+    }
+
+    public void onClickPlayAgain() {
+        game.resetForNewHand();
+        setup();
+    }
+
+    public void onClickBet(long cost) {
+        player.initialBet(cost);
     }
 }
