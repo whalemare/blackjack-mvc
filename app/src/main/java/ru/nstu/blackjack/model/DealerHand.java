@@ -11,7 +11,7 @@ import io.reactivex.subjects.Subject;
  * Created by bryancapps on 12/22/16.
  */
 
-class DealerHand extends Hand {
+public class DealerHand extends Hand {
     private final transient Subject<Boolean> events;
     private boolean firstCardVisibility;
 
@@ -33,7 +33,7 @@ class DealerHand extends Hand {
         events.onNext(firstCardVisibility);
     }
 
-    int realScore() {
+    public int realScore() {
         if (firstCardVisibility) {
             return score();
         } else {

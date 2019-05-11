@@ -63,15 +63,7 @@ public class GameData implements Serializable {
         deck.shuffle();
     }
 
-    public void checkDealerBlackjack() {
-        if (((DealerHand) dealer.getHand()).realScore() == 21 && dealer.getHand().size() == 2) {
-            for (Player player : players()) {
-                player.endHand();
-            }
-        }
-    }
-
-    boolean shouldShowdown() {
+    public boolean shouldShowdown() {
         boolean allWaiting = true;
         for (Player player : players()) {
             if (player.status() != GameStatus.WAITING && player.status() != GameStatus.SHOWDOWN) {
@@ -82,7 +74,7 @@ public class GameData implements Serializable {
         return allWaiting;
     }
 
-    void showdown() {
+    public void showdown() {
         ((DealerHand) dealer.getHand()).setFirstCardVisibility(true);
         ((DealerHand) dealer.getHand()).takeWhileLower(deck, 17);
         for (Player player : players()) {
