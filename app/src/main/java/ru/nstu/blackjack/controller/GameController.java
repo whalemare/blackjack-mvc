@@ -125,6 +125,14 @@ public class GameController {
 
     public void onClickBet() {
         player.initialBet(pendingBet);
+        game.setMyMoney(game.getMyMoney() - pendingBet);
+        game.drawCardForDealer();
+        player.draw();
+        game.drawCardForDealer();
+        player.draw();
+
+        player.checkBlackjack();
+        game.checkDealerBlackjack();
     }
 
     public void onClickOneMoreGame() {

@@ -88,11 +88,11 @@ public class Game implements Serializable {
         deck.shuffle();
     }
 
-    void drawCardForDealer() {
+    public void drawCardForDealer() {
         dealerHand.draw(deck);
     }
 
-    void checkDealerBlackjack() {
+    public void checkDealerBlackjack() {
         if (dealerHand.realScore() == 21 && dealerHand.size() == 2) {
             for (Player player : players) {
                 player.endHand();

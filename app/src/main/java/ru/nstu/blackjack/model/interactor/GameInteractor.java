@@ -38,6 +38,10 @@ public class GameInteractor {
         return pendingBet != 0 && pendingBet <= myMoney;
     }
 
+    public boolean canDouble(long myMoney, long bet, long cardsSize) {
+        return myMoney >= bet && cardsSize == 2;
+    }
+
     public List<Card> getCardStack(int size) {
         List<Card> cards = new ArrayList<>(size);
         for (Card.Rank rank : Card.Rank.values()) {

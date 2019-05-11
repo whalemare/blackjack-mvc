@@ -7,9 +7,9 @@ import java.util.List;
  */
 public class PlayerState {
 
-    long bet;
-    List<Card> cards;
-    GameStatus status;
+    private long bet;
+    private List<Card> cards;
+    private GameStatus status;
 
     public PlayerState(long bet, List<Card> cards, GameStatus status) {
         this.bet = bet;
@@ -21,16 +21,8 @@ public class PlayerState {
         return bet;
     }
 
-    public void setBet(long bet) {
-        this.bet = bet;
-    }
-
     public List<Card> getCards() {
         return cards;
-    }
-
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
     }
 
     public GameStatus getStatus() {

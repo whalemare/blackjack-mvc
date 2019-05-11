@@ -9,8 +9,11 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 
 public class Player implements Serializable {
+    @Deprecated
     private final Game game;
+
     private final Hand hand;
+
     private final transient Subject<PlayerState> states;
     private long bet;
     private GameStatus status;
@@ -65,7 +68,7 @@ public class Player implements Serializable {
         return hand.cards();
     }
 
-    private void draw() {
+    public void draw() {
         hand.draw(game.deck());
     }
 
@@ -77,16 +80,9 @@ public class Player implements Serializable {
     public void initialBet(long bet) {
         setStatus(GameStatus.HITTING);
         setBet(bet);
-        game.setMyMoney(game.getMyMoney() - bet);
-        draw();
-        game.drawCardForDealer();
-        draw();
-        game.drawCardForDealer();
-        checkBlackjack();
-        game.checkDealerBlackjack();
     }
 
-    private void checkBlackjack() {
+    public void checkBlackjack() {
         if(hand.score() == 21 && hand.size() == 2) {
             endHand();
         }
@@ -112,36 +108,11 @@ public class Player implements Serializable {
         endHand();
     }
 
-    public void split() {
-        Card card = hand.removeLastCard();
-        Player newPlayer = game.newPlayer();
-        newPlayer.setBet(getBet());
-        game.setMyMoney(game.getMyMoney() - newPlayer.getBet());
-        newPlayer.hand.add(card);
-        hand.draw(game.deck());
-        newPlayer.hand.draw(game.deck());
-        newPlayer.setStatus(GameStatus.HITTING);
-        newPlayer.checkBlackjack();
-    }
-
     void endHand() {
         setStatus(GameStatus.WAITING);
         if (game.shouldShowdown()) {
             game.showdown();
         }
-    }
-
-    public boolean isSplittable() {
-        if (cards().size() == 2) {
-            Card firstCard = cards().get(0);
-            Card secondCard = cards().get(1);
-            return firstCard.rank == secondCard.rank;
-        }
-        return false;
-    }
-
-    public boolean isDoublable() {
-        return game.getMyMoney() >= getBet() && cards().size() == 2;
     }
 
     //endregion
