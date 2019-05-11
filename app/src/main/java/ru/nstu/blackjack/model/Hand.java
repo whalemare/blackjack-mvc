@@ -40,8 +40,8 @@ public class Hand implements Serializable, Iterable<Card> {
         return cards.size();
     }
 
-    public void draw(Deck deck) {
-        Card card = deck.nextCard();
+    @Deprecated
+    public void draw(Card card) {
         add(card);
     }
 

@@ -61,7 +61,7 @@ class DealerHand extends Hand {
 
     void drawUpToSeventeen(Deck deck) {
         while (score() < 17) {
-            draw(deck);
+            add(deck.nextCard());
         }
     }
 }

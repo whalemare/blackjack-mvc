@@ -45,7 +45,7 @@ public class GameController {
     private void startNewGame() {
         this.game = new Game(
                 settings.getLong("getMyMoney", START_MONEY),
-                new Deck(interactor.getCardStack(52))
+                new Deck(interactor.getCardStack(152))
         );
 
 //        Disposable listsOfPlayers = game.getObservable()
@@ -116,19 +116,19 @@ public class GameController {
     }
 
     public void onClickResetGame() {
-        game.setMyMoney(1000);
+        game.getMe().addMoney(1000);
         game.resetForNewHand();
         startNewGame();
     }
 
     public void onClickBet() {
         game.getMe().initialBet(pendingBet);
-        game.setMyMoney(game.getMyMoney() - pendingBet);
+        game.getMe().takeMoney(pendingBet);
 
-        game.nextCardDealer();
-        game.getMe().nextCard(game.getDeck());
-        game.nextCardDealer();
-        game.getMe().nextCard(game.getDeck());
+        game.getDealer().getHand().add(game.getDeck().nextCard());
+        game.getMe().getHand().add(game.getDeck().nextCard());
+        game.getDealer().getHand().add(game.getDeck().nextCard());
+        game.getMe().getHand().add(game.getDeck().nextCard());
 
         game.getMe().checkBlackjack();
         game.checkDealerBlackjack();
@@ -150,7 +150,10 @@ public class GameController {
     }
 
     public void onClickHit() {
-        game.getMe().hit();
+        game.getMe().getHand().add(game.getDeck().nextCard());
+        if (interactor.isGameEnd(game)) {
+            game.getMe().endHand();
+        }
     }
 
     public void onClickStay() {

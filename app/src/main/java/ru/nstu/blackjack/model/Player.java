@@ -15,12 +15,15 @@ public class Player implements Serializable {
     private final Hand hand;
 
     private final transient Subject<PlayerState> states;
+    private long money;
     private long bet;
     private GameStatus status;
 
-    Player(Game game, Hand hand) {
+    Player(Game game, Hand hand, long startMoney) {
         this.game = game;
         this.hand = hand;
+        this.money = startMoney;
+
         bet = 0;
         status = GameStatus.BETTING;
         states = BehaviorSubject.create();
@@ -72,10 +75,6 @@ public class Player implements Serializable {
         return hand.cards();
     }
 
-    public void nextCard(Deck deck) {
-        hand.draw(deck);
-    }
-
     public int score() {
         return hand.score();
     }
@@ -92,27 +91,11 @@ public class Player implements Serializable {
         }
     }
 
-    //region Hitting and Staying
-
-    public void hit() {
-        hand.draw(game.getDeck());
-        if (hand.score() > 21) {
-            endHand();
-        }
-    }
-
     public void stay() {
         endHand();
     }
 
-    public void doubleHand() {
-        game.setMyMoney(game.getMyMoney() - getBet());
-        setBet(getBet() * 2);
-        hand.draw(game.getDeck());
-        endHand();
-    }
-
-    void endHand() {
+    public void endHand() {
         setStatus(GameStatus.WAITING);
         if (game.shouldShowdown()) {
             game.showdown();
@@ -170,6 +153,20 @@ public class Player implements Serializable {
             return GameOutcome.PLAYER_BUST;
         }
         return GameOutcome.ERROR;
+    }
+
+    public long getMoney() {
+        return money;
+    }
+
+    public void addMoney(long value) {
+        money += value;
+        publishState();
+    }
+
+    public void takeMoney(long value) {
+        money -= value;
+        publishState();
     }
 
     //endregion

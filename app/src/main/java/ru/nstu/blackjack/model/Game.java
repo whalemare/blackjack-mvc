@@ -12,16 +12,14 @@ import ru.nstu.blackjack.utils.Utils;
 
 public class Game implements Serializable {
     private final Deck deck;
-    private long myMoney;
     private final Player me;
     private final Player dealer;
     private final transient Subject<GameState> states;
 
     public Game(long startMoney, Deck deck) {
         this.deck = deck;
-        myMoney = startMoney;
-        dealer = new Player(this, new DealerHand());
-        me = new Player(this, new Hand());
+        dealer = new Player(this, new DealerHand(), startMoney);
+        me = new Player(this, new Hand(), startMoney);
         states = BehaviorSubject.create();
 
         dealer.getHand().getEvents().subscribe(s -> publishState());
@@ -39,18 +37,13 @@ public class Game implements Serializable {
     private void publishState() {
         states.onNext(new GameState.GameStateBuilder()
                 .setPlayerCount(players().size())
-                .setMoney((int) myMoney)
+                .setMoney((int) me.getMoney())
                 .setDealerCards(dealer.cards())
                 .createGameState());
     }
 
     public List<Player> players() {
         return Utils.listOf(me);
-    }
-
-    public void setMyMoney(long myMoney) {
-        this.myMoney = myMoney;
-        publishState();
     }
 
     public Deck getDeck() {
@@ -60,7 +53,7 @@ public class Game implements Serializable {
     //region View Methods
 
     public long getMyMoney() {
-        return myMoney;
+        return getMe().getMoney();
     }
 
     public List<Card> dealerCards() {
@@ -82,10 +75,6 @@ public class Game implements Serializable {
         dealer.getHand().clear();
         ((DealerHand) dealer.getHand()).setFirstCardVisibility(false);
         deck.shuffle();
-    }
-
-    public void nextCardDealer() {
-        dealer.getHand().draw(deck);
     }
 
     public void checkDealerBlackjack() {
@@ -112,7 +101,7 @@ public class Game implements Serializable {
         ((DealerHand) dealer.getHand()).drawUpToSeventeen(deck);
         for (Player player : players()) {
             player.setStatus(GameStatus.SHOWDOWN);
-            setMyMoney(getMyMoney() + player.winnings());
+            getMe().addMoney(player.winnings());
         }
     }
 
