@@ -5,10 +5,12 @@ import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import ru.nstu.blackjack.model.Deck;
 import ru.nstu.blackjack.model.Game;
 import ru.nstu.blackjack.model.GameState;
 import ru.nstu.blackjack.model.GameStatus;
@@ -27,11 +29,13 @@ public class GameController {
 
     private final GameActivity view;
     private final SharedPreferences settings;
+    private final GameInteractor interactor = new GameInteractor();
+
     public Game game;
     public Player player;
+
     private ArrayList<Object> disposables;
     private CompositeDisposable disposable;
-    private final GameInteractor interactor = new GameInteractor();
 
     private long pendingBet = 0;
 
@@ -42,7 +46,10 @@ public class GameController {
     }
 
     private void startNewGame() {
-        this.game = new Game(settings.getLong("getMyMoney", START_MONEY));
+        this.game = new Game(
+                settings.getLong("getMyMoney", START_MONEY),
+                new Deck(new Random())
+        );
         this.player = game.newPlayer();
 
 //        Disposable listsOfPlayers = game.getObservable()

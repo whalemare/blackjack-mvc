@@ -6,17 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Representation of a deck of playing cards
- * <p/>
- * Created by Bryan Capps on 8/4/15.
- */
-class Deck implements Serializable {
+public class Deck implements Serializable {
     private final List<Card> cards;
     private final Random random;
     private int index;
 
-    Deck(Random random) {
+    public Deck(Random random) {
         this.random = random;
         index = 0;
         cards = new ArrayList<>(52);

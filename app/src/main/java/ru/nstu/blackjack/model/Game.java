@@ -3,7 +3,6 @@ package ru.nstu.blackjack.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -17,8 +16,8 @@ public class Game implements Serializable {
     private final List<Player> players;
     private final transient Subject<GameState> states;
 
-    public Game(long startMoney) {
-        deck = new Deck(new Random());
+    public Game(long startMoney, Deck deck) {
+        this.deck = deck;
         myMoney = startMoney;
         dealerHand = new DealerHand();
         players = new ArrayList<>();
