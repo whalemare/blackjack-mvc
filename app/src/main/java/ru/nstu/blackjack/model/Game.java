@@ -17,9 +17,9 @@ public class Game implements Serializable {
     private final List<Player> players;
     private final transient Subject<GameState> states;
 
-    public Game() {
+    public Game(long startMoney) {
         deck = new Deck(new Random());
-        myMoney = 1000;
+        myMoney = startMoney;
         dealerHand = new DealerHand();
         players = new ArrayList<>();
         states = BehaviorSubject.create();

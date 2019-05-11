@@ -23,7 +23,7 @@ import ru.nstu.blackjack.view.GameActivity;
  */
 public class GameController {
 
-    public static int DEFAULT_MONEY = 1000;
+    public static int START_MONEY = 1000;
 
     private final GameActivity view;
     private final SharedPreferences settings;
@@ -38,12 +38,11 @@ public class GameController {
     public GameController(GameActivity view) {
         this.view = view;
         this.settings = view.getPreferences(Context.MODE_PRIVATE);
-        setup();
+        startNewGame();
     }
 
-    private void setup() {
-        this.game = new Game();
-        game.setMyMoney(settings.getLong("getMyMoney", DEFAULT_MONEY));
+    private void startNewGame() {
+        this.game = new Game(settings.getLong("getMyMoney", START_MONEY));
         this.player = game.newPlayer();
 
 //        Disposable listsOfPlayers = game.getObservable()
@@ -59,7 +58,7 @@ public class GameController {
                 .map(PlayerState::getStatus)
                 .filter(status -> status == GameStatus.BETTING && game.getMyMoney() <= 0)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(status -> view.showResetGameDialog(DEFAULT_MONEY));
+                .subscribe(status -> view.showResetGameDialog(START_MONEY));
 
         Disposable dealerHands = game.getObservable()
                 .map(GameState::getDealerCards)
@@ -115,7 +114,7 @@ public class GameController {
     public void onClickResetGame() {
         game.setMyMoney(1000);
         game.resetForNewHand();
-        setup();
+        startNewGame();
     }
 
     public void onClickBet() {
