@@ -76,14 +76,4 @@ public class GameData implements Serializable {
         }
         return allWaiting;
     }
-
-    public void showdown() {
-        ((DealerHand) dealer.getHand()).setFirstCardVisibility(true);
-        ((DealerHand) dealer.getHand()).takeWhileLower(deck, 17);
-        for (Player player : players()) {
-            player.setStatus(GameStatus.SHOWDOWN);
-            getMe().addMoney(player.winnings());
-        }
-    }
-
 }

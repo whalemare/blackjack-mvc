@@ -158,7 +158,7 @@ public class GameController {
         if (interactor.isOverscore(game.getMe())) {
             game.getMe().endHand();
             if (interactor.isGameShouldShowdown(game)) {
-                game.showdown();
+                interactor.showdown(game);
             }
         }
     }

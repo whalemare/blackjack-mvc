@@ -30,7 +30,7 @@ public class DealerHand extends Hand {
                         .map(b -> String.format("firstCardVisibility set to %b", b)));
     }
 
-    void setFirstCardVisibility(boolean firstCardVisibility) {
+    public void setFirstCardVisibility(boolean firstCardVisibility) {
         this.firstCardVisibility = firstCardVisibility;
         events.onNext(firstCardVisibility);
     }
@@ -61,7 +61,7 @@ public class DealerHand extends Hand {
         }
     }
 
-    void takeWhileLower(Deck deck, int value) {
+    public void takeWhileLower(Deck deck, int value) {
         while (score() < value) {
             addCard(deck.nextCard());
         }

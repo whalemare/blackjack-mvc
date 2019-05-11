@@ -86,11 +86,6 @@ public class Player implements Serializable {
         setStatus(GameStatus.WAITING);
     }
 
-    @Deprecated
-    public long winnings() {
-       return -1;
-    }
-
     public long getMoney() {
         return money;
     }

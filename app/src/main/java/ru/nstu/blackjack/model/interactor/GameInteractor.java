@@ -130,7 +130,14 @@ public class GameInteractor {
         player.setStatus(GameStatus.WAITING);
 
         if (isGameShouldShowdown(game)) {
-            game.showdown(); // TODO: refactor here
+            showdown(game);
         }
+    }
+
+    public void showdown(GameData game) {
+        ((DealerHand) game.getDealer().getHand()).setFirstCardVisibility(true);
+        ((DealerHand) game.getDealer().getHand()).takeWhileLower(game.getDeck(), 17);
+        game.getMe().setStatus(GameStatus.SHOWDOWN);
+        game.getMe().addMoney(calculateWinnings(outcome(game.getMe(), game.getDealer()), game.getMe().getBet()));
     }
 }
