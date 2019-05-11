@@ -161,35 +161,35 @@ public class GameActivity extends AppCompatActivity {
 
     void setShowdownText() {
         Resources resources = getResources();
-        long winnings = controller.player.winnings();
+        long winnings = controller.game.getMe().winnings();
 
         String text;
-        switch (controller.player.outcome()) {
+        switch (controller.game.getMe().outcome()) {
             case PUSH:
                 handOverTextView.setText(R.string.push);
                 break;
             case PLAYER_BLACKJACK:
-                text = String.format(resources.getString(R.string.player_blackjack), winnings - controller.player.getBet());
+                text = String.format(resources.getString(R.string.player_blackjack), winnings - controller.game.getMe().getBet());
                 handOverTextView.setText(text);
                 break;
             case DEALER_BLACKJACK:
-                text = String.format(resources.getString(R.string.dealer_blackjack), controller.player.getBet());
+                text = String.format(resources.getString(R.string.dealer_blackjack), controller.game.getMe().getBet());
                 handOverTextView.setText(text);
                 break;
             case PLAYER_WIN:
-                text = String.format(resources.getString(R.string.player_wins), winnings - controller.player.getBet());
+                text = String.format(resources.getString(R.string.player_wins), winnings - controller.game.getMe().getBet());
                 handOverTextView.setText(text);
                 break;
             case DEALER_BUST:
-                text = String.format(resources.getString(R.string.dealer_busts), winnings - controller.player.getBet());
+                text = String.format(resources.getString(R.string.dealer_busts), winnings - controller.game.getMe().getBet());
                 handOverTextView.setText(text);
                 break;
             case DEALER_WIN:
-                text = String.format(resources.getString(R.string.dealer_wins), controller.player.getBet());
+                text = String.format(resources.getString(R.string.dealer_wins), controller.game.getMe().getBet());
                 handOverTextView.setText(text);
                 break;
             case PLAYER_BUST:
-                text = String.format(resources.getString(R.string.player_busts), controller.player.getBet());
+                text = String.format(resources.getString(R.string.player_busts), controller.game.getMe().getBet());
                 handOverTextView.setText(text);
                 break;
             case ERROR:
@@ -200,7 +200,7 @@ public class GameActivity extends AppCompatActivity {
 
     public void showDealerCards(List<Card> cards) {
         TransitionManager.beginDelayedTransition(dealerHandView, transitionSet);
-        if (controller.player.status() == GameStatus.BETTING) {
+        if (controller.game.getMe().status() == GameStatus.BETTING) {
             dealerHandView.removeAllViews();
             cards = new ArrayList<>();
             cards.add(Card.dealerBlank);
@@ -224,7 +224,7 @@ public class GameActivity extends AppCompatActivity {
     public void showPlayerCards(List<Card> cards) {
         TransitionManager.beginDelayedTransition(playerHandView, transitionSet);
 
-        if (controller.player.status() == GameStatus.BETTING) {
+        if (controller.game.getMe().status() == GameStatus.BETTING) {
             cards = new ArrayList<>();
             Collections.addAll(cards, Card.playerBlank, Card.playerBlank);
         }
@@ -246,7 +246,7 @@ public class GameActivity extends AppCompatActivity {
         for (int i = cards.size(); i < 2; i++) {
             setCardForImageView(Card.playerBlank, newImageViewForLayout(playerHandView));
         }
-        playerScoreTextView.setText(String.valueOf(controller.player.score()));
+        playerScoreTextView.setText(String.valueOf(controller.game.getMe().score()));
     }
 
     private ImageView newImageViewForLayout(LinearLayout handView) {

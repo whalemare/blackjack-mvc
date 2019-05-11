@@ -1,30 +1,35 @@
 package ru.nstu.blackjack.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
+import java8.util.stream.StreamSupport;
+import ru.nstu.blackjack.utils.Utils;
 
 public class Game implements Serializable {
     private final Deck deck;
     private long myMoney;
-    private final DealerHand dealerHand;
-    private final List<Player> players;
+    private final Player me;
+    private final Player dealer;
     private final transient Subject<GameState> states;
 
     public Game(long startMoney, Deck deck) {
         this.deck = deck;
         myMoney = startMoney;
-        dealerHand = new DealerHand();
-        players = new ArrayList<>();
+        dealer = new Player(this, new DealerHand());
+        me = new Player(this, new Hand());
         states = BehaviorSubject.create();
 
-        dealerHand.getEvents().subscribe(s -> publishState());
+        dealer.getHand().getEvents().subscribe(s -> publishState());
         publishState();
+    }
+
+    public Player getMe() {
+        return me;
     }
 
     public Observable<GameState> getObservable() {
@@ -35,12 +40,12 @@ public class Game implements Serializable {
         states.onNext(new GameState.GameStateBuilder()
                 .setPlayerCount(players().size())
                 .setMoney((int) myMoney)
-                .setDealerCards(dealerCards())
+                .setDealerCards(dealer.cards())
                 .createGameState());
     }
 
     public List<Player> players() {
-        return new ArrayList<>(players);
+        return Utils.listOf(me);
     }
 
     public void setMyMoney(long myMoney) {
@@ -59,18 +64,11 @@ public class Game implements Serializable {
     }
 
     public List<Card> dealerCards() {
-        return dealerHand.cards();
-    }
-
-    public Player newPlayer() {
-        Player newPlayer = new Player(this, new Hand());
-        players.add(newPlayer);
-        publishState();
-        return newPlayer;
+        return dealer.getHand().cards();
     }
 
     public int dealerScore() {
-        return dealerHand.score();
+        return dealer.getHand().score();
     }
 
     //endregion
@@ -78,23 +76,21 @@ public class Game implements Serializable {
     //region Game Control
 
     public void resetForNewHand() {
-        while (players.size() > 1) {
-            players.remove(players.size() - 1);
-            publishState();
-        }
-        players.get(0).reset();
-        dealerHand.clear();
-        dealerHand.setFirstCardVisibility(false);
+        StreamSupport.stream(players())
+                .forEach(Player::reset);
+
+        dealer.getHand().clear();
+        ((DealerHand) dealer.getHand()).setFirstCardVisibility(false);
         deck.shuffle();
     }
 
-    public void drawCardForDealer() {
-        dealerHand.draw(deck);
+    public void nextCardDealer() {
+        dealer.getHand().draw(deck);
     }
 
     public void checkDealerBlackjack() {
-        if (dealerHand.realScore() == 21 && dealerHand.size() == 2) {
-            for (Player player : players) {
+        if (((DealerHand) dealer.getHand()).realScore() == 21 && dealer.getHand().size() == 2) {
+            for (Player player : players()) {
                 player.endHand();
             }
         }
@@ -102,7 +98,7 @@ public class Game implements Serializable {
 
     boolean shouldShowdown() {
         boolean allWaiting = true;
-        for (Player player : players) {
+        for (Player player : players()) {
             if (player.status() != GameStatus.WAITING && player.status() != GameStatus.SHOWDOWN) {
                 allWaiting = false;
                 break;
@@ -112,12 +108,16 @@ public class Game implements Serializable {
     }
 
     void showdown() {
-        dealerHand.setFirstCardVisibility(true);
-        dealerHand.drawUpToSeventeen(deck);
-        for (Player player : players) {
+        ((DealerHand) dealer.getHand()).setFirstCardVisibility(true);
+        ((DealerHand) dealer.getHand()).drawUpToSeventeen(deck);
+        for (Player player : players()) {
             player.setStatus(GameStatus.SHOWDOWN);
             setMyMoney(getMyMoney() + player.winnings());
         }
+    }
+
+    public Player getDealer() {
+        return dealer;
     }
 
     //endregion

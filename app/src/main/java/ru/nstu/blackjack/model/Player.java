@@ -29,6 +29,10 @@ public class Player implements Serializable {
         publishState();
     }
 
+    public Hand getHand() {
+        return hand;
+    }
+
     public Observable<PlayerState> getObservable() {
         return states.hide().observeOn(Schedulers.computation());
     }
@@ -68,7 +72,7 @@ public class Player implements Serializable {
         return hand.cards();
     }
 
-    public void draw() {
+    public void nextCard() {
         hand.draw(game.deck());
     }
 
@@ -141,7 +145,7 @@ public class Player implements Serializable {
         int playerScore = hand.score();
         int dealerScore = game.dealerScore();
         int nPlayerCards = hand.size();
-        int nDealerCards = game.dealerCards().size();
+        int nDealerCards = game.getDealer().cards().size();
 
         if (dealerScore == playerScore && dealerScore <= 21) {
             // push

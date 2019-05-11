@@ -13,7 +13,6 @@ import ru.nstu.blackjack.model.Deck;
 import ru.nstu.blackjack.model.Game;
 import ru.nstu.blackjack.model.GameState;
 import ru.nstu.blackjack.model.GameStatus;
-import ru.nstu.blackjack.model.Player;
 import ru.nstu.blackjack.model.PlayerState;
 import ru.nstu.blackjack.model.interactor.GameInteractor;
 import ru.nstu.blackjack.view.GameActivity;
@@ -31,7 +30,6 @@ public class GameController {
     private final GameInteractor interactor = new GameInteractor();
 
     public Game game;
-    public Player player;
 
     private ArrayList<Object> disposables;
     private CompositeDisposable disposable;
@@ -49,7 +47,6 @@ public class GameController {
                 settings.getLong("getMyMoney", START_MONEY),
                 new Deck(interactor.getCardStack(52))
         );
-        this.player = game.newPlayer();
 
 //        Disposable listsOfPlayers = game.getObservable()
 //                .map(GameState::getPlayerCount)
@@ -58,8 +55,7 @@ public class GameController {
 //                .observeOn(AndroidSchedulers.mainThread())
 //                .subscribe(view::showPlayers);
 
-        Disposable noMoney = game.players()
-                .get(0)
+        Disposable noMoney = game.getMe()
                 .getObservable()
                 .map(PlayerState::getStatus)
                 .filter(status -> status == GameStatus.BETTING && game.getMyMoney() <= 0)
@@ -78,20 +74,20 @@ public class GameController {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::showMoney);
 
-        Disposable playerHands = player.getObservable()
+        Disposable playerHands = game.getMe().getObservable()
                 .map(PlayerState::getCards)
                 .distinctUntilChanged()
                 .filter(cards -> cards.size() != 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::showPlayerCards);
 
-        Disposable bets = player.getObservable()
+        Disposable bets = game.getMe().getObservable()
                 .map(PlayerState::getBet)
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::showBet);
 
-        Disposable statuses = player.getObservable()
+        Disposable statuses = game.getMe().getObservable()
                 .map(PlayerState::getStatus)
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -124,14 +120,15 @@ public class GameController {
     }
 
     public void onClickBet() {
-        player.initialBet(pendingBet);
+        game.getMe().initialBet(pendingBet);
         game.setMyMoney(game.getMyMoney() - pendingBet);
-        game.drawCardForDealer();
-        player.draw();
-        game.drawCardForDealer();
-        player.draw();
 
-        player.checkBlackjack();
+        game.nextCardDealer();
+        game.getMe().nextCard();
+        game.nextCardDealer();
+        game.getMe().nextCard();
+
+        game.getMe().checkBlackjack();
         game.checkDealerBlackjack();
     }
 
@@ -151,11 +148,11 @@ public class GameController {
     }
 
     public void onClickHit() {
-        player.hit();
+        game.getMe().hit();
     }
 
     public void onClickStay() {
-        player.stay();
+        game.getMe().stay();
     }
 
     public void onDestroy() {
