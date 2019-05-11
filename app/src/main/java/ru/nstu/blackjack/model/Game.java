@@ -53,7 +53,7 @@ public class Game implements Serializable {
         publishState();
     }
 
-    Deck deck() {
+    public Deck getDeck() {
         return deck;
     }
 

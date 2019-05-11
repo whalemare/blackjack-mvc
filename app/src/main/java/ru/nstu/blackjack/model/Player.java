@@ -72,8 +72,8 @@ public class Player implements Serializable {
         return hand.cards();
     }
 
-    public void nextCard() {
-        hand.draw(game.deck());
+    public void nextCard(Deck deck) {
+        hand.draw(deck);
     }
 
     public int score() {
@@ -95,7 +95,7 @@ public class Player implements Serializable {
     //region Hitting and Staying
 
     public void hit() {
-        hand.draw(game.deck());
+        hand.draw(game.getDeck());
         if (hand.score() > 21) {
             endHand();
         }
@@ -108,7 +108,7 @@ public class Player implements Serializable {
     public void doubleHand() {
         game.setMyMoney(game.getMyMoney() - getBet());
         setBet(getBet() * 2);
-        hand.draw(game.deck());
+        hand.draw(game.getDeck());
         endHand();
     }
 

@@ -126,9 +126,9 @@ public class GameController {
         game.setMyMoney(game.getMyMoney() - pendingBet);
 
         game.nextCardDealer();
-        game.getMe().nextCard();
+        game.getMe().nextCard(game.getDeck());
         game.nextCardDealer();
-        game.getMe().nextCard();
+        game.getMe().nextCard(game.getDeck());
 
         game.getMe().checkBlackjack();
         game.checkDealerBlackjack();
