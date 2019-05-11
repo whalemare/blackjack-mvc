@@ -46,12 +46,6 @@ public class Hand implements Serializable, Iterable<Card> {
         addCard(card);
     }
 
-    public Card removeLastCard() {
-        Card lastCard = cards.remove(cards.size() - 1);
-        events.onNext("card removed");
-        return lastCard;
-    }
-
     public int score() {
         int score = 0;
         boolean hasAce = false;
@@ -69,14 +63,6 @@ public class Hand implements Serializable, Iterable<Card> {
         }
 
         return score;
-    }
-
-    public boolean isSplittable() {
-        return size() == 2 && get(0).value() == get(1).value();
-    }
-
-    public Card get(int index) {
-        return cards.get(index);
     }
 
     public void clear() {

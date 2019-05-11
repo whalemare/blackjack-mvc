@@ -83,13 +83,13 @@ public class GameInteractor {
             case PLAYER_BUST:
                 return 0L;
             default:
-                throw new UnsupportedOperationException("Not handled status " + status);
+                throw new UnsupportedOperationException("Not handled getStatus " + status);
         }
     }
 
     public boolean isGameShouldShowdown(GameData game) {
         boolean allWaiting = true;
-        if (game.getMe().status() != GameStatus.WAITING && game.getMe().status() != GameStatus.SHOWDOWN) {
+        if (game.getMe().getStatus() != GameStatus.WAITING && game.getMe().getStatus() != GameStatus.SHOWDOWN) {
             allWaiting = false;
         }
         return allWaiting;

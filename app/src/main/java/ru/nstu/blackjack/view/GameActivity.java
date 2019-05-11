@@ -2,7 +2,6 @@ package ru.nstu.blackjack.view;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +28,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
 import ru.nstu.blackjack.model.Player;
@@ -38,8 +36,6 @@ import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameStatus;
 
 public class GameActivity extends AppCompatActivity {
-
-    private List<Disposable> disposables;
 
     private GameController controller;
 
@@ -112,11 +108,6 @@ public class GameActivity extends AppCompatActivity {
 
     public void showMoney(long money) {
         moneyTextView.setText(getString(R.string.your_money, money));
-        buttonIncrementBet.setEnabled(money > 100);
-    }
-
-    public void showPlayers(List<Player> players) {
-        Log.d("GAME", "showPlayers: " + players.toString());
     }
 
     public void showResetGameDialog(final int dollars) {
@@ -198,9 +189,9 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void showDealerCards(List<Card> cards) {
+    public void showDealerCards(Player dealer, Player me, List<Card> cards) {
         TransitionManager.beginDelayedTransition(dealerHandView, transitionSet);
-        if (controller.game.getMe().status() == GameStatus.BETTING) {
+        if (me.getStatus() == GameStatus.BETTING) {
             dealerHandView.removeAllViews();
             cards = new ArrayList<>();
             cards.add(Card.dealerBlank);
@@ -217,36 +208,36 @@ public class GameActivity extends AppCompatActivity {
             }
             setCardForImageView(card, imageView);
         }
-        dealerScoreTextView.setText(String.valueOf(controller.game.getDealer().getHand().score()));
+        dealerScoreTextView.setText(String.valueOf(dealer.getHand().score()));
     }
 
 
-    public void showPlayerCards(List<Card> cards) {
+    public void showPlayerCards(Player player, List<Card> cards) {
         TransitionManager.beginDelayedTransition(playerHandView, transitionSet);
 
-        if (controller.game.getMe().status() == GameStatus.BETTING) {
+        if (player.getStatus() == GameStatus.BETTING) {
             cards = new ArrayList<>();
             Collections.addAll(cards, Card.playerBlank, Card.playerBlank);
         }
 
-        // remove any extra views
         if (playerHandView.getChildCount() > cards.size()) {
             int count = playerHandView.getChildCount() - cards.size();
             playerHandView.removeViews(cards.size(), count);
         }
-        // set any existing views
+
         for (int i = 0; i < playerHandView.getChildCount(); i++) {
             ImageView cardImageView = (ImageView) playerHandView.getChildAt(i);
             setCardForImageView(cards.get(i), cardImageView);
         }
-        // addCard any missing views
+
         for (int i = playerHandView.getChildCount(); i < cards.size(); i++) {
             setCardForImageView(cards.get(i), newImageViewForLayout(playerHandView));
         }
         for (int i = cards.size(); i < 2; i++) {
             setCardForImageView(Card.playerBlank, newImageViewForLayout(playerHandView));
         }
-        playerScoreTextView.setText(String.valueOf(controller.game.getMe().score()));
+
+        playerScoreTextView.setText(String.valueOf(player.getHand().score()));
     }
 
     private ImageView newImageViewForLayout(LinearLayout handView) {
@@ -306,13 +297,11 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
-        for (Disposable disposable : disposables) {
-            disposable.dispose();
+        if (isFinishing()) {
+            controller.onDestroy();
+            unbinder.unbind();
         }
-        disposables.clear();
-        controller.onDestroy();
+        super.onDestroy();
     }
 
     public void enableIncrementButton(boolean canIncrement) {

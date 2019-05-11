@@ -44,7 +44,7 @@ public class Player implements Serializable {
         states.onNext(new PlayerState.PlayerStateBuilder()
                 .setBet(getBet())
                 .setCards(cards())
-                .setStatus(status())
+                .setStatus(getStatus())
                 .createPlayerState());
     }
 
@@ -62,16 +62,12 @@ public class Player implements Serializable {
         publishState();
     }
 
-    public GameStatus status() {
+    public GameStatus getStatus() {
         return status;
     }
 
     public List<Card> cards() {
         return hand.cards();
-    }
-
-    public int score() {
-        return hand.score();
     }
 
     /**
@@ -80,10 +76,6 @@ public class Player implements Serializable {
     public void initialBet(long bet) {
         setStatus(GameStatus.HITTING);
         setBet(bet);
-    }
-
-    public void endHand() {
-        setStatus(GameStatus.WAITING);
     }
 
     public long getMoney() {

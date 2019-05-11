@@ -27,10 +27,8 @@ public class GameController {
     private final SharedPreferences settings;
     private final GameInteractor interactor = new GameInteractor();
 
-    public GameData game;
-
+    private GameData game;
     private CompositeDisposable disposable;
-
     private long pendingBet = 0;
 
     public GameController(GameActivity view) {
@@ -59,7 +57,9 @@ public class GameController {
                 .map(GameState::getDealerCards) // берем только карты диллера
                 .distinctUntilChanged() // берем только новые значения, чтобы избежать перерисовки UI
                 .observeOn(AndroidSchedulers.mainThread()) // выносим работу с UI в главный поток из-за ограничений ОС Android
-                .subscribe(view::showDealerCards); // вызываем метод отображения карт диллера у view
+                .subscribe(cards -> {
+                    view.showDealerCards(game.getDealer(), game.getMe(), cards);
+                }); // вызываем метод отображения карт диллера у view
 
         Disposable monies = game.getObservable()
                 .map(GameState::getMoney)
@@ -72,7 +72,9 @@ public class GameController {
                 .distinctUntilChanged()
                 .filter(cards -> cards.size() != 1)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::showPlayerCards);
+                .subscribe(cards -> {
+                    view.showPlayerCards(game.getMe(), cards);
+                });
 
         Disposable bets = game.getMe().getObservable()
                 .map(PlayerState::getBet)
@@ -156,7 +158,7 @@ public class GameController {
         game.getMe().getHand().addCard(game.getDeck().nextCard());
 
         if (interactor.isOverscore(game.getMe())) {
-            game.getMe().endHand();
+            interactor.endHand(game, game.getMe());
             if (interactor.isGameShouldShowdown(game)) {
                 interactor.showdown(game);
             }

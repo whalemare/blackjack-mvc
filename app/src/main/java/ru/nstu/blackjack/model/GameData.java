@@ -69,7 +69,7 @@ public class GameData implements Serializable {
     public boolean shouldShowdown() {
         boolean allWaiting = true;
         for (Player player : players()) {
-            if (player.status() != GameStatus.WAITING && player.status() != GameStatus.SHOWDOWN) {
+            if (player.getStatus() != GameStatus.WAITING && player.getStatus() != GameStatus.SHOWDOWN) {
                 allWaiting = false;
                 break;
             }
