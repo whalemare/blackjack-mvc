@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ru.nstu.blackjack.model.DealerHand;
-import ru.nstu.blackjack.model.GameData;
-import ru.nstu.blackjack.model.Hand;
-import ru.nstu.blackjack.model.Player;
+import ru.nstu.blackjack.model.data.DealerHand;
+import ru.nstu.blackjack.model.data.GameData;
+import ru.nstu.blackjack.model.data.Hand;
+import ru.nstu.blackjack.model.data.Player;
 import ru.nstu.blackjack.model.data.Card;
 import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameStatus;

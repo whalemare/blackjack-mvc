@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import ru.nstu.blackjack.model.GameData;
+import ru.nstu.blackjack.model.data.GameData;
 import ru.nstu.blackjack.model.data.Deck;
 import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameState;

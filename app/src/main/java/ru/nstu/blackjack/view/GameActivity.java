@@ -30,7 +30,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
-import ru.nstu.blackjack.model.Player;
+import ru.nstu.blackjack.model.data.Player;
 import ru.nstu.blackjack.model.data.Card;
 import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameStatus;
@@ -50,8 +50,10 @@ public class GameActivity extends AppCompatActivity {
 
     @BindView(R.id.text_player_score)
     TextView playerScoreTextView;
+
     @BindView(R.id.text_dealer_score)
     TextView dealerScoreTextView;
+
     @BindView(R.id.text_showdown_description)
     TextView handOverTextView;
 

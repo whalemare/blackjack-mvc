@@ -1,4 +1,4 @@
-package ru.nstu.blackjack.model;
+package ru.nstu.blackjack.model.data;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,9 +7,6 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
-import ru.nstu.blackjack.model.data.Card;
-import ru.nstu.blackjack.model.data.GameStatus;
-import ru.nstu.blackjack.model.data.PlayerState;
 
 
 public class Player implements Serializable {

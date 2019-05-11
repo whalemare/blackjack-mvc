@@ -1,4 +1,4 @@
-package ru.nstu.blackjack.model;
+package ru.nstu.blackjack.model.data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
-import ru.nstu.blackjack.model.data.Card;
-import ru.nstu.blackjack.model.data.Deck;
 
 /**
  * Created by bryancapps on 12/22/16.
