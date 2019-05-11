@@ -7,44 +7,25 @@ import java.util.List;
  */
 public class GameState {
 
-    int money;
-    List<Card> dealerCards;
-    int playerCount;
+    private int money;
+    private List<Card> dealerCards;
 
-    public GameState(int money, List<Card> dealerCards, int playerCount) {
+    public GameState(int money, List<Card> dealerCards) {
         this.money = money;
         this.dealerCards = dealerCards;
-        this.playerCount = playerCount;
     }
 
     public int getMoney() {
         return money;
     }
 
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
     public List<Card> getDealerCards() {
         return dealerCards;
-    }
-
-    public void setDealerCards(List<Card> dealerCards) {
-        this.dealerCards = dealerCards;
-    }
-
-    public int getPlayerCount() {
-        return playerCount;
-    }
-
-    public void setPlayerCount(int playerCount) {
-        this.playerCount = playerCount;
     }
 
     public static class GameStateBuilder {
         private int money;
         private List<Card> dealerCards;
-        private int playerCount;
 
         public GameStateBuilder setMoney(int money) {
             this.money = money;
@@ -56,13 +37,8 @@ public class GameState {
             return this;
         }
 
-        public GameStateBuilder setPlayerCount(int playerCount) {
-            this.playerCount = playerCount;
-            return this;
-        }
-
         public GameState createGameState() {
-            return new GameState(money, dealerCards, playerCount);
+            return new GameState(money, dealerCards);
         }
     }
 }

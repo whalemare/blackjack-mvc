@@ -7,7 +7,6 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
-import java8.util.stream.StreamSupport;
 import ru.nstu.blackjack.utils.Utils;
 
 public class GameData implements Serializable {
@@ -40,12 +39,12 @@ public class GameData implements Serializable {
 
     private void publishState() {
         states.onNext(new GameState.GameStateBuilder()
-                .setPlayerCount(players().size())
                 .setMoney((int) me.getMoney())
                 .setDealerCards(dealer.cards())
                 .createGameState());
     }
 
+    @Deprecated
     public List<Player> players() {
         return Utils.listOf(me);
     }
@@ -55,8 +54,8 @@ public class GameData implements Serializable {
     }
 
     public void resetForNewHand() {
-        StreamSupport.stream(players())
-                .forEach(Player::reset);
+        me.getHand().clear();
+        me.setStatus(GameStatus.BETTING);
 
         dealer.getHand().clear();
         ((DealerHand) dealer.getHand()).setFirstCardVisibility(false);

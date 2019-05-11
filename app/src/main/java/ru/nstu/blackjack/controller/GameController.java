@@ -9,12 +9,10 @@ import java.util.Collections;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import ru.nstu.blackjack.model.DealerHand;
 import ru.nstu.blackjack.model.Deck;
 import ru.nstu.blackjack.model.GameData;
 import ru.nstu.blackjack.model.GameState;
 import ru.nstu.blackjack.model.GameStatus;
-import ru.nstu.blackjack.model.Player;
 import ru.nstu.blackjack.model.PlayerState;
 import ru.nstu.blackjack.model.interactor.GameInteractor;
 import ru.nstu.blackjack.view.GameActivity;
@@ -45,6 +43,7 @@ public class GameController {
     }
 
     private void startNewGame() {
+        this.pendingBet = 0;
         this.game = new GameData(
                 settings.getLong("getMyMoney", START_MONEY),
                 new Deck(interactor.getCardStack(152))
@@ -111,8 +110,6 @@ public class GameController {
     }
 
     public void onClickResetGame() {
-        game.getMe().addMoney(1000);
-        game.resetForNewHand();
         startNewGame();
     }
 
@@ -125,13 +122,12 @@ public class GameController {
         game.getDealer().getHand().addCard(game.getDeck().nextCard());
         game.getMe().getHand().addCard(game.getDeck().nextCard());
 
-        game.getMe().checkBlackjack();
+        if (interactor.isBlackjack(game.getMe().getHand())) {
+            game.getMe().endHand();
+        }
 
-        // check that dealer has blackjack
-        if (((DealerHand) game.getDealer().getHand()).realScore() == 21 && game.getDealer().getHand().size() == 2) {
-            for (Player player : game.players()) {
-                player.endHand();
-            }
+        if (interactor.isBlackjack(game.getDealer().getHand())) {
+            game.getMe().endHand();
         }
     }
 

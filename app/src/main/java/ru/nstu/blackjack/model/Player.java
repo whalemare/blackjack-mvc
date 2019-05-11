@@ -48,11 +48,6 @@ public class Player implements Serializable {
                 .createPlayerState());
     }
 
-    void reset() {
-        hand.clear();
-        setStatus(GameStatus.BETTING);
-    }
-
     public long getBet() {
         return bet;
     }
