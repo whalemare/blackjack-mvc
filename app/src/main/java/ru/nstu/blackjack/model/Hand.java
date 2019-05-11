@@ -41,7 +41,7 @@ public class Hand implements Serializable, Iterable<Card> {
     }
 
     public void draw(Deck deck) {
-        Card card = deck.draw();
+        Card card = deck.nextCard();
         add(card);
     }
 

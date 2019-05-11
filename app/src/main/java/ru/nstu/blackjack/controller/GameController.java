@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -48,7 +47,7 @@ public class GameController {
     private void startNewGame() {
         this.game = new Game(
                 settings.getLong("getMyMoney", START_MONEY),
-                new Deck(new Random())
+                new Deck(interactor.getCardStack(52))
         );
         this.player = game.newPlayer();
 

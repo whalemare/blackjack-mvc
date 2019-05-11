@@ -1,5 +1,11 @@
 package ru.nstu.blackjack.model.interactor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import ru.nstu.blackjack.model.Card;
+
 /**
  * @author Anton Vlasov - whalemare
  * @since 2019
@@ -30,5 +36,18 @@ public class GameInteractor {
 
     public boolean canMakeBet(long pendingBet, long myMoney) {
         return pendingBet != 0 && pendingBet <= myMoney;
+    }
+
+    public List<Card> getCardStack(int size) {
+        List<Card> cards = new ArrayList<>(size);
+        for (Card.Rank rank : Card.Rank.values()) {
+            if (rank == Card.Rank.BLANK) continue;
+            for (Card.Suit suit : Card.Suit.values()) {
+                if (suit == Card.Suit.DEALER || suit == Card.Suit.PLAYER) continue;
+                cards.add(Card.create(rank, suit));
+            }
+        }
+        Collections.shuffle(cards);
+        return cards;
     }
 }

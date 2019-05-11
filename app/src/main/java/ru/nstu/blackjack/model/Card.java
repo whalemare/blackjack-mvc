@@ -28,7 +28,7 @@ public class Card implements Serializable {
         this.suit = suit;
     }
 
-    static Card create(Rank rank, Suit suit) {
+    public static Card create(Rank rank, Suit suit) {
         return new Card(rank, suit);
     }
 
@@ -94,11 +94,11 @@ public class Card implements Serializable {
         return array[rank.ordinal()];
     }
 
-    enum Rank {
+    public enum Rank {
         ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, BLANK
     }
 
-    enum Suit {
+    public enum Suit {
         CLUBS, DIAMONDS, HEARTS, SPADES, PLAYER, DEALER
     }
 }
