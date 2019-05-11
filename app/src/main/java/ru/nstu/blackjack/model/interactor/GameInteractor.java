@@ -12,10 +12,6 @@ import ru.nstu.blackjack.model.data.Card;
 import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameStatus;
 
-/**
- * @author Anton Vlasov - whalemare
- * @since 2019
- */
 public class GameInteractor {
 
     private static final int BET_STEP = 100;
