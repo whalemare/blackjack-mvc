@@ -2,9 +2,6 @@ package ru.nstu.blackjack.model.data;
 
 import java.util.List;
 
-/**
- * Created by bryancapps on 12/27/16.
- */
 public class PlayerState {
 
     private long bet;
