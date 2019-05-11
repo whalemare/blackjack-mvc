@@ -8,8 +8,12 @@ public class GameInteractor {
 
     private static final int BET_STEP = 100;
 
-    public long decrementBet(long currentBet) {
-        return Math.max(0, currentBet - BET_STEP);
+    public long decrementBet(long currentBet, long myMoney) {
+        if (myMoney < currentBet) {
+            return myMoney;
+        } else {
+            return Math.max(0, currentBet - BET_STEP);
+        }
     }
 
     public long incrementBet(long currentBet, long max) {

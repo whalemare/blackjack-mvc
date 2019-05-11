@@ -29,7 +29,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
@@ -67,27 +66,27 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.button_decrement_bet)
     Button buttonDecrementBet;
 
-    @BindView(R.id.button_double)
-    Button doubleButton;
-    @BindView(R.id.button_split)
-    Button splitButton;
     @BindView(R.id.layout_bet_decision)
-    View betDecisionView;
+    View containerBetting;
+
     @BindView(R.id.layout_hitting_decision)
-    View hitAndStayView;
+    View containerHitting;
+
     @BindView(R.id.layout_play_again)
     View playAgainView;
+
     @BindView(R.id.layout_waiting)
     View waitingView;
+
     @BindView(R.id.layout_dealer_hand)
     LinearLayout dealerHandView;
+
     @BindView(R.id.layout_player_hand)
     LinearLayout playerHandView;
 
     private NumberFormat currencyFormat;
 
     private Unbinder unbinder;
-    private CompositeDisposable disposable;
     private TransitionSet transitionSet;
 
     @Override
@@ -125,32 +124,10 @@ public class GameActivity extends AppCompatActivity {
                 .setTitle("Закончились деньги")
                 .setMessage(String.format(Locale.US,
                         "Но вы можете попробовать снова, начав с $%d", dollars))
-                .setPositiveButton("Начать", (dialog, which) -> controller.game.setMyMoney(dollars))
+                .setPositiveButton("Начать", (dialog, which) -> controller.onClickResetGame())
                 .show();
     }
 
-    public void setBet(long bet) {
-        textPendingBet.setText(getString(R.string.current_bet, bet));
-
-        long decrementAmount;
-        if (bet < 100 && bet != 0) {
-            decrementAmount = bet;
-        } else {
-            decrementAmount = 100;
-        }
-        buttonDecrementBet.setText(getString(R.string.decrement_bet, decrementAmount));
-        buttonDecrementBet.setEnabled(bet != 0);
-        buttonMakeBet.setEnabled(bet != 0);
-
-        long incrementAmount;
-        if (bet > controller.game.getMyMoney() - 100 && bet != controller.game.getMyMoney()) {
-            incrementAmount = bet;
-        } else {
-            incrementAmount = 100;
-        }
-        buttonIncrementBet.setText(getString(R.string.increment_bet, incrementAmount));
-        buttonIncrementBet.setEnabled(bet != controller.game.getMyMoney());
-    }
 
     @OnClick(R.id.button_decrement_bet)
     public void decrementBet() {
@@ -174,22 +151,12 @@ public class GameActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_hit)
     public void onHit() {
-        controller.player.hit();
+        controller.onClickHit();
     }
 
     @OnClick(R.id.button_stay)
     public void onStay() {
-        controller.player.stay();
-    }
-
-    @OnClick(R.id.button_double)
-    public void onDouble() {
-        controller.player.doubleHand();
-    }
-
-    @OnClick(R.id.button_split)
-    public void onSplit() {
-        controller.player.split();
+        controller.onClickStay();
     }
 
     void setShowdownText() {
@@ -231,10 +198,6 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    //endregion
-
-    //region Hand Views
-
     public void showDealerCards(List<Card> cards) {
         TransitionManager.beginDelayedTransition(dealerHandView, transitionSet);
         if (controller.player.status() == GameStatus.BETTING) {
@@ -256,6 +219,7 @@ public class GameActivity extends AppCompatActivity {
         }
         dealerScoreTextView.setText(String.valueOf(controller.game.dealerScore()));
     }
+
 
     public void showPlayerCards(List<Card> cards) {
         TransitionManager.beginDelayedTransition(playerHandView, transitionSet);
@@ -283,8 +247,6 @@ public class GameActivity extends AppCompatActivity {
             setCardForImageView(Card.playerBlank, newImageViewForLayout(playerHandView));
         }
         playerScoreTextView.setText(String.valueOf(controller.player.score()));
-        doubleButton.setEnabled(controller.player.isDoublable());
-        splitButton.setEnabled(controller.player.isSplittable());
     }
 
     private ImageView newImageViewForLayout(LinearLayout handView) {
@@ -306,8 +268,6 @@ public class GameActivity extends AppCompatActivity {
         imageView.setTag(card.toString());
     }
 
-    //endregion
-
     private void showMoneyChange(double change) {
         if (change > 0) {
             moneyTextView.setText(String.format("%s\n+ %s", moneyTextView.getText(), currencyFormat.format(change)));
@@ -317,31 +277,29 @@ public class GameActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_play_again)
     public void playAgain() {
-        controller.onClickPlayAgain();
+        controller.onClickOneMoreGame();
     }
 
-    public void showDecisionView(GameStatus status) {
+    public void showGameStatus(GameStatus status) {
         if (status == GameStatus.BETTING) {
-            hitAndStayView.setVisibility(View.GONE);
+            containerHitting.setVisibility(View.GONE);
             waitingView.setVisibility(View.GONE);
             playAgainView.setVisibility(View.GONE);
-            betDecisionView.setVisibility(View.VISIBLE);
+            containerBetting.setVisibility(View.VISIBLE);
         } else if (status == GameStatus.HITTING) {
-            betDecisionView.setVisibility(View.GONE);
+            containerBetting.setVisibility(View.GONE);
             waitingView.setVisibility(View.GONE);
             playAgainView.setVisibility(View.GONE);
-            hitAndStayView.setVisibility(View.VISIBLE);
-            splitButton.setEnabled(controller.player.isSplittable());
-            doubleButton.setEnabled(controller.player.isDoublable());
+            containerHitting.setVisibility(View.VISIBLE);
         } else if (status == GameStatus.WAITING) {
-            betDecisionView.setVisibility(View.GONE);
-            hitAndStayView.setVisibility(View.GONE);
+            containerBetting.setVisibility(View.GONE);
+            containerHitting.setVisibility(View.GONE);
             playAgainView.setVisibility(View.GONE);
             waitingView.setVisibility(View.VISIBLE);
         } else if (status == GameStatus.SHOWDOWN) {
             setShowdownText();
-            betDecisionView.setVisibility(View.GONE);
-            hitAndStayView.setVisibility(View.GONE);
+            containerBetting.setVisibility(View.GONE);
+            containerHitting.setVisibility(View.GONE);
             waitingView.setVisibility(View.GONE);
             playAgainView.setVisibility(View.VISIBLE);
         }
@@ -369,4 +327,5 @@ public class GameActivity extends AppCompatActivity {
     public void enableMakeBetButton(boolean canMakeBet) {
         buttonMakeBet.setEnabled(canMakeBet);
     }
+
 }

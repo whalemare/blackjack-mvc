@@ -67,7 +67,6 @@ public class Player implements Serializable {
 
     private void draw() {
         hand.draw(game.deck());
-
     }
 
     public int score() {

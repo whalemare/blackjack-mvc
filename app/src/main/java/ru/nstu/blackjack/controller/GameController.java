@@ -46,12 +46,12 @@ public class GameController {
         game.setMyMoney(settings.getLong("getMyMoney", DEFAULT_MONEY));
         this.player = game.newPlayer();
 
-        Disposable listsOfPlayers = game.getObservable()
-                .map(GameState::getPlayerCount)
-                .distinctUntilChanged()
-                .map(count -> game.players())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::showPlayers);
+//        Disposable listsOfPlayers = game.getObservable()
+//                .map(GameState::getPlayerCount)
+//                .distinctUntilChanged()
+//                .map(count -> game.players())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(view::showPlayers);
 
         Disposable noMoney = game.players()
                 .get(0)
@@ -90,18 +90,18 @@ public class GameController {
                 .map(PlayerState::getStatus)
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::showDecisionView);
+                .subscribe(view::showGameStatus);
 
         disposables = new ArrayList<>();
         disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);
-        Collections.addAll(disposables, listsOfPlayers, noMoney);
+        Collections.addAll(disposables, noMoney);
 
         view.showMoney(game.getMyMoney());
         view.showBet(pendingBet);
     }
 
     public void onClickDecrementBet() {
-        pendingBet = interactor.decrementBet(pendingBet);
+        pendingBet = interactor.decrementBet(pendingBet, game.getMyMoney());
         view.showBet(pendingBet);
         validateChangeBetButtons();
     }
@@ -112,19 +112,18 @@ public class GameController {
         validateChangeBetButtons();
     }
 
-    public void onDestroy() {
-        settings.edit()
-                .putLong("getMyMoney", game.getMyMoney())
-                .apply();
-    }
-
-    public void onClickPlayAgain() {
+    public void onClickResetGame() {
+        game.setMyMoney(1000);
         game.resetForNewHand();
         setup();
     }
 
     public void onClickBet() {
         player.initialBet(pendingBet);
+    }
+
+    public void onClickOneMoreGame() {
+        game.resetForNewHand();
     }
 
     private void validateChangeBetButtons() {
@@ -136,5 +135,19 @@ public class GameController {
 
         boolean canMakeBet = interactor.canMakeBet(pendingBet, game.getMyMoney());
         view.enableMakeBetButton(canMakeBet);
+    }
+
+    public void onClickHit() {
+        player.hit();
+    }
+
+    public void onClickStay() {
+        player.stay();
+    }
+
+    public void onDestroy() {
+        settings.edit()
+                .putLong("getMyMoney", game.getMyMoney())
+                .apply();
     }
 }
