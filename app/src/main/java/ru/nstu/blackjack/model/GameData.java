@@ -10,13 +10,13 @@ import io.reactivex.subjects.Subject;
 import java8.util.stream.StreamSupport;
 import ru.nstu.blackjack.utils.Utils;
 
-public class Game implements Serializable {
+public class GameData implements Serializable {
     private final Deck deck;
     private final Player me;
     private final Player dealer;
     private final transient Subject<GameState> states;
 
-    public Game(long startMoney, Deck deck) {
+    public GameData(long startMoney, Deck deck) {
         this.deck = deck;
         dealer = new Player(this, new DealerHand(), startMoney);
         me = new Player(this, new Hand(), startMoney);
@@ -28,6 +28,10 @@ public class Game implements Serializable {
 
     public Player getMe() {
         return me;
+    }
+
+    public Player getDealer() {
+        return dealer;
     }
 
     public Observable<GameState> getObservable() {
@@ -49,24 +53,6 @@ public class Game implements Serializable {
     public Deck getDeck() {
         return deck;
     }
-
-    //region View Methods
-
-    public long getMyMoney() {
-        return getMe().getMoney();
-    }
-
-    public List<Card> dealerCards() {
-        return dealer.getHand().cards();
-    }
-
-    public int dealerScore() {
-        return dealer.getHand().score();
-    }
-
-    //endregion
-
-    //region Game Control
 
     public void resetForNewHand() {
         StreamSupport.stream(players())
@@ -104,11 +90,5 @@ public class Game implements Serializable {
             getMe().addMoney(player.winnings());
         }
     }
-
-    public Player getDealer() {
-        return dealer;
-    }
-
-    //endregion
 
 }

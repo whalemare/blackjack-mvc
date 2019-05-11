@@ -10,7 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.model.Deck;
-import ru.nstu.blackjack.model.Game;
+import ru.nstu.blackjack.model.GameData;
 import ru.nstu.blackjack.model.GameState;
 import ru.nstu.blackjack.model.GameStatus;
 import ru.nstu.blackjack.model.PlayerState;
@@ -29,7 +29,7 @@ public class GameController {
     private final SharedPreferences settings;
     private final GameInteractor interactor = new GameInteractor();
 
-    public Game game;
+    public GameData game;
 
     private ArrayList<Object> disposables;
     private CompositeDisposable disposable;
@@ -43,22 +43,15 @@ public class GameController {
     }
 
     private void startNewGame() {
-        this.game = new Game(
+        this.game = new GameData(
                 settings.getLong("getMyMoney", START_MONEY),
                 new Deck(interactor.getCardStack(152))
         );
 
-//        Disposable listsOfPlayers = game.getObservable()
-//                .map(GameState::getPlayerCount)
-//                .distinctUntilChanged()
-//                .map(count -> game.players())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(view::showPlayers);
-
         Disposable noMoney = game.getMe()
                 .getObservable()
                 .map(PlayerState::getStatus)
-                .filter(status -> status == GameStatus.BETTING && game.getMyMoney() <= 0)
+                .filter(status -> status == GameStatus.BETTING && game.getMe().getMoney() <= 0)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(status -> view.showResetGameDialog(START_MONEY));
 
@@ -99,18 +92,18 @@ public class GameController {
         disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);
         Collections.addAll(disposables, noMoney);
 
-        view.showMoney(game.getMyMoney());
+        view.showMoney(game.getMe().getMoney());
         view.showBet(pendingBet);
     }
 
     public void onClickDecrementBet() {
-        pendingBet = interactor.decrementBet(pendingBet, game.getMyMoney());
+        pendingBet = interactor.decrementBet(pendingBet, game.getMe().getMoney());
         view.showBet(pendingBet);
         validateChangeBetButtons();
     }
 
     public void onClickIncrementBet() {
-        pendingBet = interactor.incrementBet(pendingBet, game.getMyMoney());
+        pendingBet = interactor.incrementBet(pendingBet, game.getMe().getMoney());
         view.showBet(pendingBet);
         validateChangeBetButtons();
     }
@@ -139,13 +132,13 @@ public class GameController {
     }
 
     private void validateChangeBetButtons() {
-        boolean canIncrement = interactor.canIncrement(pendingBet, game.getMyMoney());
+        boolean canIncrement = interactor.canIncrement(pendingBet, game.getMe().getMoney());
         view.enableIncrementButton(canIncrement);
 
-        boolean canDecrement = interactor.canDecrement(pendingBet, game.getMyMoney());
+        boolean canDecrement = interactor.canDecrement(pendingBet, game.getMe().getMoney());
         view.enableDecrementButton(canDecrement);
 
-        boolean canMakeBet = interactor.canMakeBet(pendingBet, game.getMyMoney());
+        boolean canMakeBet = interactor.canMakeBet(pendingBet, game.getMe().getMoney());
         view.enableMakeBetButton(canMakeBet);
     }
 
@@ -162,7 +155,7 @@ public class GameController {
 
     public void onDestroy() {
         settings.edit()
-                .putLong("getMyMoney", game.getMyMoney())
+                .putLong("getMyMoney", game.getMe().getMoney())
                 .apply();
     }
 }

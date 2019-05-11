@@ -33,7 +33,7 @@ import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
 import ru.nstu.blackjack.model.Card;
-import ru.nstu.blackjack.model.Game;
+import ru.nstu.blackjack.model.GameData;
 import ru.nstu.blackjack.model.GameStatus;
 import ru.nstu.blackjack.model.Player;
 
@@ -160,7 +160,7 @@ public class GameActivity extends AppCompatActivity {
         controller.onClickStay();
     }
 
-    void setShowdownText(Game game) {
+    void setShowdownText(GameData game) {
         Resources resources = getResources();
         long winnings = game.getMe().winnings();
 
@@ -218,7 +218,7 @@ public class GameActivity extends AppCompatActivity {
             }
             setCardForImageView(card, imageView);
         }
-        dealerScoreTextView.setText(String.valueOf(controller.game.dealerScore()));
+        dealerScoreTextView.setText(String.valueOf(controller.game.getDealer().getHand().score()));
     }
 
 
@@ -281,7 +281,7 @@ public class GameActivity extends AppCompatActivity {
         controller.onClickOneMoreGame();
     }
 
-    public void showGameStatus(GameStatus status, Game game) {
+    public void showGameStatus(GameStatus status, GameData game) {
         if (status == GameStatus.BETTING) {
             containerHitting.setVisibility(View.GONE);
             waitingView.setVisibility(View.GONE);

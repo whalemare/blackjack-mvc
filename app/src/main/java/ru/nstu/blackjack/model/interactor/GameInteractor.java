@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.nstu.blackjack.model.Card;
-import ru.nstu.blackjack.model.Game;
+import ru.nstu.blackjack.model.GameData;
 
 /**
  * @author Anton Vlasov - whalemare
@@ -56,7 +56,7 @@ public class GameInteractor {
         return cards;
     }
 
-    public boolean isGameEnd(Game game) {
+    public boolean isGameEnd(GameData game) {
         return game.getMe().getHand().score() > 21;
     }
 }

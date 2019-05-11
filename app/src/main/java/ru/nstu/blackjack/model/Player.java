@@ -10,7 +10,7 @@ import io.reactivex.subjects.Subject;
 
 public class Player implements Serializable {
     @Deprecated
-    private final Game game;
+    private final GameData game;
 
     private final Hand hand;
 
@@ -19,7 +19,7 @@ public class Player implements Serializable {
     private long bet;
     private GameStatus status;
 
-    Player(Game game, Hand hand, long startMoney) {
+    Player(GameData game, Hand hand, long startMoney) {
         this.game = game;
         this.hand = hand;
         this.money = startMoney;
@@ -126,7 +126,7 @@ public class Player implements Serializable {
 
     public GameOutcome outcome() {
         int playerScore = hand.score();
-        int dealerScore = game.dealerScore();
+        int dealerScore = game.getDealer().getHand().score();
         int nPlayerCards = hand.size();
         int nDealerCards = game.getDealer().cards().size();
 
