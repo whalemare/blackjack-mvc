@@ -78,7 +78,7 @@ public class Player implements Serializable {
     public void initialBet(long bet) {
         setStatus(GameStatus.HITTING);
         setBet(bet);
-        game.setMoney(game.money() - bet);
+        game.setMyMoney(game.getMyMoney() - bet);
         draw();
         game.drawCardForDealer();
         draw();
@@ -107,7 +107,7 @@ public class Player implements Serializable {
     }
 
     public void doubleHand() {
-        game.setMoney(game.money() - getBet());
+        game.setMyMoney(game.getMyMoney() - getBet());
         setBet(getBet() * 2);
         hand.draw(game.deck());
         endHand();
@@ -117,7 +117,7 @@ public class Player implements Serializable {
         Card card = hand.removeLastCard();
         Player newPlayer = game.newPlayer();
         newPlayer.setBet(getBet());
-        game.setMoney(game.money() - newPlayer.getBet());
+        game.setMyMoney(game.getMyMoney() - newPlayer.getBet());
         newPlayer.hand.add(card);
         hand.draw(game.deck());
         newPlayer.hand.draw(game.deck());
@@ -142,7 +142,7 @@ public class Player implements Serializable {
     }
 
     public boolean isDoublable() {
-        return game.money() >= getBet() && cards().size() == 2;
+        return game.getMyMoney() >= getBet() && cards().size() == 2;
     }
 
     //endregion

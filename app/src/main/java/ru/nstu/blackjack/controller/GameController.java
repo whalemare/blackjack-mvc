@@ -14,6 +14,7 @@ import ru.nstu.blackjack.model.GameState;
 import ru.nstu.blackjack.model.GameStatus;
 import ru.nstu.blackjack.model.Player;
 import ru.nstu.blackjack.model.PlayerState;
+import ru.nstu.blackjack.model.interactor.GameInteractor;
 import ru.nstu.blackjack.view.GameActivity;
 
 /**
@@ -30,6 +31,9 @@ public class GameController {
     public Player player;
     private ArrayList<Object> disposables;
     private CompositeDisposable disposable;
+    private final GameInteractor interactor = new GameInteractor();
+
+    private long pendingBet = 100;
 
     public GameController(GameActivity view) {
         this.view = view;
@@ -39,9 +43,8 @@ public class GameController {
 
     private void setup() {
         this.game = new Game();
-        game.setMoney(settings.getLong("money", DEFAULT_MONEY));
+        game.setMyMoney(settings.getLong("getMyMoney", DEFAULT_MONEY));
         this.player = game.newPlayer();
-        view.startGame(game, player);
 
         Disposable listsOfPlayers = game.getObservable()
                 .map(GameState::getPlayerCount)
@@ -54,7 +57,7 @@ public class GameController {
                 .get(0)
                 .getObservable()
                 .map(PlayerState::getStatus)
-                .filter(status -> status == GameStatus.BETTING && game.money() <= 0)
+                .filter(status -> status == GameStatus.BETTING && game.getMyMoney() <= 0)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(status -> view.showResetGameDialog(DEFAULT_MONEY));
 
@@ -93,13 +96,33 @@ public class GameController {
         disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);
         Collections.addAll(disposables, listsOfPlayers, noMoney);
 
-        view.showMoney(game.money());
+        view.showMoney(game.getMyMoney());
+        view.showBet(pendingBet);
     }
 
+    public void onClickDecrementBet() {
+        pendingBet = interactor.decrementBet(pendingBet);
+        view.showBet(pendingBet);
+        validateChangeBetButtons();
+    }
+
+    public void onClickIncrementBet() {
+        pendingBet = interactor.incrementBet(pendingBet, game.getMyMoney());
+        view.showBet(pendingBet);
+        validateChangeBetButtons();
+    }
+
+    private void validateChangeBetButtons() {
+        boolean canIncrement = interactor.canIncrement(pendingBet, game.getMyMoney());
+        view.enableIncrementButton(canIncrement);
+
+        boolean canDecrement = interactor.canDecrement(pendingBet, game.getMyMoney());
+        view.enableDecrementButton(canDecrement);
+    }
 
     public void onDestroy() {
         settings.edit()
-                .putLong("money", game.money())
+                .putLong("getMyMoney", game.getMyMoney())
                 .apply();
     }
 
@@ -108,7 +131,7 @@ public class GameController {
         setup();
     }
 
-    public void onClickBet(long cost) {
-        player.initialBet(cost);
+    public void onClickBet() {
+        player.initialBet(pendingBet);
     }
 }

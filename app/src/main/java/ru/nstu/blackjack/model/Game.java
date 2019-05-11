@@ -12,14 +12,14 @@ import io.reactivex.subjects.Subject;
 
 public class Game implements Serializable {
     private final Deck deck;
-    private long money;
+    private long myMoney;
     private final DealerHand dealerHand;
     private final List<Player> players;
     private final transient Subject<GameState> states;
 
     public Game() {
         deck = new Deck(new Random());
-        money = 1000;
+        myMoney = 1000;
         dealerHand = new DealerHand();
         players = new ArrayList<>();
         states = BehaviorSubject.create();
@@ -35,7 +35,7 @@ public class Game implements Serializable {
     private void publishState() {
         states.onNext(new GameState.GameStateBuilder()
                 .setPlayerCount(players().size())
-                .setMoney((int) money)
+                .setMoney((int) myMoney)
                 .setDealerCards(dealerCards())
                 .createGameState());
     }
@@ -44,8 +44,8 @@ public class Game implements Serializable {
         return new ArrayList<>(players);
     }
 
-    public void setMoney(long money) {
-        this.money = money;
+    public void setMyMoney(long myMoney) {
+        this.myMoney = myMoney;
         publishState();
     }
 
@@ -55,8 +55,8 @@ public class Game implements Serializable {
 
     //region View Methods
 
-    public long money() {
-        return money;
+    public long getMyMoney() {
+        return myMoney;
     }
 
     public List<Card> dealerCards() {
@@ -117,7 +117,7 @@ public class Game implements Serializable {
         dealerHand.drawUpToSeventeen(deck);
         for (Player player : players) {
             player.setStatus(GameStatus.SHOWDOWN);
-            setMoney(money() + player.winnings());
+            setMyMoney(getMyMoney() + player.winnings());
         }
     }
 

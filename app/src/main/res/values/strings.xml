@@ -33,7 +33,7 @@
     <string name="push">It\'s a push. You get your bet back.</string>
     <string name="dealer_initial_score">0</string>
     <string name="player_initial_score">0</string>
-    <string name="your_money_label">"Your money: "</string>
+    <string name="my_money_label">"Мои деньги: "</string>
     <string name="main_activity_logo_description">app logo</string>
     <string name="waiting">Waiting for all split hands to finish.</string>
     <string name="hand_outcome_error">Sorry, there was some kind of error :(</string>

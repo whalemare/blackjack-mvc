@@ -34,7 +34,6 @@ import io.reactivex.disposables.Disposable;
 import ru.nstu.blackjack.R;
 import ru.nstu.blackjack.controller.GameController;
 import ru.nstu.blackjack.model.Card;
-import ru.nstu.blackjack.model.Game;
 import ru.nstu.blackjack.model.GameStatus;
 import ru.nstu.blackjack.model.Player;
 
@@ -46,22 +45,26 @@ public class GameActivity extends AppCompatActivity {
 
     @BindView(R.id.text_money)
     TextView moneyTextView;
-    @BindView(R.id.text_bet)
-    TextView betTextView;
+
+    @BindView(R.id.text_pending_bet)
+    TextView textPendingBet;
+
+    @BindView(R.id.text_bet_reminder)
+    TextView bigBetView;
+
     @BindView(R.id.text_player_score)
     TextView playerScoreTextView;
     @BindView(R.id.text_dealer_score)
     TextView dealerScoreTextView;
     @BindView(R.id.text_showdown_description)
     TextView handOverTextView;
-    @BindView(R.id.text_bet_reminder)
-    TextView bigBetView;
+
     @BindView(R.id.button_bet)
     Button betButton;
     @BindView(R.id.button_increment_bet)
-    Button incrementBetButton;
+    Button buttonIncrementBet;
     @BindView(R.id.button_decrement_bet)
-    Button decrementBetButton;
+    Button buttonDecrementBet;
     @BindView(R.id.button_double)
     Button doubleButton;
     @BindView(R.id.button_split)
@@ -107,11 +110,7 @@ public class GameActivity extends AppCompatActivity {
 
     public void showMoney(long money) {
         moneyTextView.setText(getString(R.string.your_money, money));
-        incrementBetButton.setEnabled(money > 100);
-    }
-
-    public void startGame(Game game, Player player) {
-
+        buttonIncrementBet.setEnabled(money > 100);
     }
 
     public void showPlayers(List<Player> players) {
@@ -124,17 +123,12 @@ public class GameActivity extends AppCompatActivity {
                 .setTitle("Закончились деньги")
                 .setMessage(String.format(Locale.US,
                         "Но вы можете попробовать снова, начав с $%d", dollars))
-                .setPositiveButton("Начать", (dialog, which) -> controller.game.setMoney(dollars))
+                .setPositiveButton("Начать", (dialog, which) -> controller.game.setMyMoney(dollars))
                 .show();
     }
 
-    private long getPendingBet() {
-        String text = betTextView.getText().toString();
-        return Long.parseLong(text.substring(1, text.length()));
-    }
-
-    private void setPendingBet(long bet) {
-        betTextView.setText(getString(R.string.current_bet, bet));
+    public void setBet(long bet) {
+        textPendingBet.setText(getString(R.string.current_bet, bet));
 
         long decrementAmount;
         if (bet < 100 && bet != 0) {
@@ -142,51 +136,38 @@ public class GameActivity extends AppCompatActivity {
         } else {
             decrementAmount = 100;
         }
-        decrementBetButton.setText(getString(R.string.decrement_bet, decrementAmount));
-        decrementBetButton.setEnabled(bet != 0);
+        buttonDecrementBet.setText(getString(R.string.decrement_bet, decrementAmount));
+        buttonDecrementBet.setEnabled(bet != 0);
         betButton.setEnabled(bet != 0);
 
         long incrementAmount;
-        if (bet > controller.game.money() - 100 && bet != controller.game.money()) {
+        if (bet > controller.game.getMyMoney() - 100 && bet != controller.game.getMyMoney()) {
             incrementAmount = bet;
         } else {
             incrementAmount = 100;
         }
-        incrementBetButton.setText(getString(R.string.increment_bet, incrementAmount));
-        incrementBetButton.setEnabled(bet != controller.game.money());
+        buttonIncrementBet.setText(getString(R.string.increment_bet, incrementAmount));
+        buttonIncrementBet.setEnabled(bet != controller.game.getMyMoney());
     }
 
     @OnClick(R.id.button_decrement_bet)
     public void decrementBet() {
-        long betDecrease;
-        if (getPendingBet() < 100) {
-            betDecrease = getPendingBet();
-        } else {
-            betDecrease = 100;
-        }
-
-        setPendingBet(getPendingBet() - betDecrease);
+        controller.onClickDecrementBet();
     }
 
     @OnClick(R.id.button_increment_bet)
     public void incrementBet() {
-        long newBet;
-        if (controller.game.money() < 100 + getPendingBet()) {
-            newBet = controller.game.money();
-        } else {
-            newBet = getPendingBet() + 100;
-        }
-
-        setPendingBet(newBet);
+        controller.onClickIncrementBet();
     }
 
     @OnClick(R.id.button_bet)
     public void onBet() {
-        controller.onClickBet(getPendingBet());
+        controller.onClickBet();
     }
 
     public void showBet(long bet) {
         bigBetView.setText(getString(R.string.current_bet, bet));
+        textPendingBet.setText(getString(R.string.current_bet, bet));
     }
 
     @OnClick(R.id.button_hit)
@@ -373,5 +354,13 @@ public class GameActivity extends AppCompatActivity {
         }
         disposables.clear();
         controller.onDestroy();
+    }
+
+    public void enableIncrementButton(boolean canIncrement) {
+        buttonIncrementBet.setEnabled(canIncrement);
+    }
+
+    public void enableDecrementButton(boolean canDecrement) {
+        buttonDecrementBet.setEnabled(canDecrement);
     }
 }

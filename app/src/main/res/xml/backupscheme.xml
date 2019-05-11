@@ -2,5 +2,5 @@
 <full-backup-content>
     <include
         domain="sharedpref"
-        path="money" />
+        path="myMoney" />
 </full-backup-content>
