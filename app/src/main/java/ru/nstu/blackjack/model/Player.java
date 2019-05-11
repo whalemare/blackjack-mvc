@@ -8,13 +8,11 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import ru.nstu.blackjack.model.data.Card;
-import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameStatus;
+import ru.nstu.blackjack.model.data.PlayerState;
+
 
 public class Player implements Serializable {
-    @Deprecated
-    private final GameData game;
-
     private final Hand hand;
 
     private final transient Subject<PlayerState> states;
@@ -22,8 +20,7 @@ public class Player implements Serializable {
     private long bet;
     private GameStatus status;
 
-    Player(GameData game, Hand hand, long startMoney) {
-        this.game = game;
+    Player(Hand hand, long startMoney) {
         this.hand = hand;
         this.money = startMoney;
 
@@ -60,7 +57,7 @@ public class Player implements Serializable {
         publishState();
     }
 
-    void setStatus(GameStatus status) {
+    public void setStatus(GameStatus status) {
         this.status = status;
         publishState();
     }
@@ -87,58 +84,11 @@ public class Player implements Serializable {
 
     public void endHand() {
         setStatus(GameStatus.WAITING);
-        if (game.shouldShowdown()) {
-            game.showdown();
-        }
     }
 
+    @Deprecated
     public long winnings() {
-        switch (outcome()) {
-            case PLAYER_BLACKJACK:
-                return Math.round(getBet() * 2.5);
-            case PLAYER_WIN:
-                return getBet() * 2;
-            case DEALER_BUST:
-                return getBet() * 2;
-            case PUSH:
-                return getBet();
-            case DEALER_BLACKJACK:
-            case DEALER_WIN:
-            case PLAYER_BUST:
-            default:
-                return 0;
-        }
-    }
-
-    public GameOutcomeStatus outcome() {
-        int playerScore = hand.score();
-        int dealerScore = game.getDealer().getHand().score();
-        int nPlayerCards = hand.size();
-        int nDealerCards = game.getDealer().cards().size();
-
-        if (dealerScore == playerScore && dealerScore <= 21) {
-            // push
-            return GameOutcomeStatus.PUSH;
-        } else if (playerScore == 21 && nPlayerCards == 2) {
-            // player has a blackjack!
-            return GameOutcomeStatus.PLAYER_BLACKJACK;
-        } else if (dealerScore == 21 && nDealerCards == 2) {
-            // dealer has a blackjack
-            return GameOutcomeStatus.DEALER_BLACKJACK;
-        } else if (playerScore > dealerScore && playerScore <= 21) {
-            // player wins!
-            return GameOutcomeStatus.PLAYER_WIN;
-        } else if (playerScore <= 21 && dealerScore > 21) {
-            // dealer busts!
-            return GameOutcomeStatus.DEALER_BUST;
-        } else if (dealerScore > playerScore && dealerScore <= 21) {
-            // dealer wins
-            return GameOutcomeStatus.DEALER_WIN;
-        } else if (playerScore > 21) {
-            // player busts
-            return GameOutcomeStatus.PLAYER_BUST;
-        }
-        return GameOutcomeStatus.ERROR;
+       return -1;
     }
 
     public long getMoney() {

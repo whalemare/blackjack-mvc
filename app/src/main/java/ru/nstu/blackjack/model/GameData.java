@@ -20,8 +20,8 @@ public class GameData implements Serializable {
 
     public GameData(long startMoney, Deck deck) {
         this.deck = deck;
-        dealer = new Player(this, new DealerHand(), startMoney);
-        me = new Player(this, new Hand(), startMoney);
+        dealer = new Player(new DealerHand(), startMoney);
+        me = new Player(new Hand(), startMoney);
         states = BehaviorSubject.create();
 
         dealer.getHand().getEvents().subscribe(s -> publishState());
@@ -65,6 +65,7 @@ public class GameData implements Serializable {
         deck.shuffle();
     }
 
+    @Deprecated
     public boolean shouldShowdown() {
         boolean allWaiting = true;
         for (Player player : players()) {

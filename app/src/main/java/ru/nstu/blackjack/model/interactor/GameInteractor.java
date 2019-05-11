@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ru.nstu.blackjack.model.data.Card;
 import ru.nstu.blackjack.model.DealerHand;
 import ru.nstu.blackjack.model.GameData;
 import ru.nstu.blackjack.model.Hand;
+import ru.nstu.blackjack.model.Player;
+import ru.nstu.blackjack.model.data.Card;
+import ru.nstu.blackjack.model.data.GameOutcomeStatus;
+import ru.nstu.blackjack.model.data.GameStatus;
 
 /**
  * @author Anton Vlasov - whalemare
@@ -41,10 +44,6 @@ public class GameInteractor {
         return pendingBet != 0 && pendingBet <= myMoney;
     }
 
-    public boolean canDouble(long myMoney, long bet, long cardsSize) {
-        return myMoney >= bet && cardsSize == 2;
-    }
-
     public List<Card> getCardStack(int size) {
         List<Card> cards = new ArrayList<>(size);
         for (Card.Rank rank : Card.Rank.values()) {
@@ -58,8 +57,8 @@ public class GameInteractor {
         return cards;
     }
 
-    public boolean isGameEnd(GameData game) {
-        return game.getMe().getHand().score() > 21;
+    public boolean isOverscore(Player player) {
+        return player.getHand().score() > 21;
     }
 
     public boolean isBlackjack(Hand hand) {
@@ -67,5 +66,71 @@ public class GameInteractor {
                 ? ((DealerHand) hand).realScore()
                 : hand.score()
         ) == 21 && hand.size() == 2;
+    }
+
+    public Long calculateWinnings(GameOutcomeStatus status, long bet) {
+        switch (status) {
+            case PLAYER_BLACKJACK:
+                return Math.round(bet * 2.5);
+            case PLAYER_WIN:
+                return bet * 2;
+            case DEALER_BUST:
+                return bet * 2;
+            case PUSH:
+                return bet;
+            case DEALER_BLACKJACK:
+            case DEALER_WIN:
+            case PLAYER_BUST:
+                return 0L;
+            default:
+                throw new UnsupportedOperationException("Not handled status " + status);
+        }
+    }
+
+    public boolean isGameShouldShowdown(GameData game) {
+        boolean allWaiting = true;
+        if (game.getMe().status() != GameStatus.WAITING && game.getMe().status() != GameStatus.SHOWDOWN) {
+            allWaiting = false;
+        }
+        return allWaiting;
+    }
+
+    public GameOutcomeStatus outcome(Player me, Player dealer) {
+        int playerScore = me.getHand().score();
+        int dealerScore = dealer.getHand().score();
+        int nPlayerCards = me.getHand().size();
+        int nDealerCards = dealer.cards().size();
+
+        if (dealerScore == playerScore && dealerScore <= 21) {
+            // push
+            return GameOutcomeStatus.PUSH;
+        } else if (playerScore == 21 && nPlayerCards == 2) {
+            // player has a blackjack!
+            return GameOutcomeStatus.PLAYER_BLACKJACK;
+        } else if (dealerScore == 21 && nDealerCards == 2) {
+            // dealer has a blackjack
+            return GameOutcomeStatus.DEALER_BLACKJACK;
+        } else if (playerScore > dealerScore && playerScore <= 21) {
+            // player wins!
+            return GameOutcomeStatus.PLAYER_WIN;
+        } else if (playerScore <= 21 && dealerScore > 21) {
+            // dealer busts!
+            return GameOutcomeStatus.DEALER_BUST;
+        } else if (dealerScore > playerScore && dealerScore <= 21) {
+            // dealer wins
+            return GameOutcomeStatus.DEALER_WIN;
+        } else if (playerScore > 21) {
+            // player busts
+            return GameOutcomeStatus.PLAYER_BUST;
+        }
+        return GameOutcomeStatus.ERROR;
+    }
+
+    public void endHand(GameData game, Player player) {
+        player.setStatus(GameStatus.WAITING);
+
+        if (isGameShouldShowdown(game)) {
+            game.showdown(); // TODO: refactor here
+        }
     }
 }

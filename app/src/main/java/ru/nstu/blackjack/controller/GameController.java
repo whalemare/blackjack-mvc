@@ -3,17 +3,15 @@ package ru.nstu.blackjack.controller;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import ru.nstu.blackjack.model.data.Deck;
 import ru.nstu.blackjack.model.GameData;
+import ru.nstu.blackjack.model.data.Deck;
+import ru.nstu.blackjack.model.data.GameOutcomeStatus;
 import ru.nstu.blackjack.model.data.GameState;
 import ru.nstu.blackjack.model.data.GameStatus;
-import ru.nstu.blackjack.model.PlayerState;
+import ru.nstu.blackjack.model.data.PlayerState;
 import ru.nstu.blackjack.model.interactor.GameInteractor;
 import ru.nstu.blackjack.view.GameActivity;
 
@@ -31,7 +29,6 @@ public class GameController {
 
     public GameData game;
 
-    private ArrayList<Object> disposables;
     private CompositeDisposable disposable;
 
     private long pendingBet = 0;
@@ -49,6 +46,7 @@ public class GameController {
                 new Deck(interactor.getCardStack(152))
         );
 
+        // Подписываемся на изменения модели данных игрока "Я" и отслеживаем его статус игры, чтобы узнать когда кончатся деньги
         Disposable noMoney = game.getMe()
                 .getObservable()
                 .map(PlayerState::getStatus)
@@ -56,11 +54,12 @@ public class GameController {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(status -> view.showResetGameDialog(START_MONEY));
 
+        // Подписываемся на изменения модели данных игры
         Disposable dealerHands = game.getObservable()
-                .map(GameState::getDealerCards)
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::showDealerCards);
+                .map(GameState::getDealerCards) // берем только карты диллера
+                .distinctUntilChanged() // берем только новые значения, чтобы избежать перерисовки UI
+                .observeOn(AndroidSchedulers.mainThread()) // выносим работу с UI в главный поток из-за ограничений ОС Android
+                .subscribe(view::showDealerCards); // вызываем метод отображения карт диллера у view
 
         Disposable monies = game.getObservable()
                 .map(GameState::getMoney)
@@ -86,12 +85,19 @@ public class GameController {
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(status -> {
-                    view.showGameStatus(status, game);
+                    view.showGameStatus(status);
+
+                    if (status == GameStatus.SHOWDOWN) {
+                        GameOutcomeStatus outcome = interactor.outcome(game.getMe(), game.getDealer());
+                        view.setShowdownText(
+                                outcome,
+                                game.getMe().getBet(),
+                                interactor.calculateWinnings(outcome, game.getMe().getBet())
+                        );
+                    }
                 });
 
-        disposables = new ArrayList<>();
-        disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);
-        Collections.addAll(disposables, noMoney);
+        disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses, noMoney);
 
         view.showMoney(game.getMe().getMoney());
         view.showBet(pendingBet);
@@ -123,11 +129,11 @@ public class GameController {
         game.getMe().getHand().addCard(game.getDeck().nextCard());
 
         if (interactor.isBlackjack(game.getMe().getHand())) {
-            game.getMe().endHand();
+            interactor.endHand(game, game.getMe());
         }
 
         if (interactor.isBlackjack(game.getDealer().getHand())) {
-            game.getMe().endHand();
+            interactor.endHand(game, game.getMe());
         }
     }
 
@@ -148,21 +154,27 @@ public class GameController {
 
     public void onClickHit() {
         game.getMe().getHand().addCard(game.getDeck().nextCard());
-        if (interactor.isGameEnd(game)) {
+
+        if (interactor.isOverscore(game.getMe())) {
             game.getMe().endHand();
-            if (game.shouldShowdown()) {
+            if (interactor.isGameShouldShowdown(game)) {
                 game.showdown();
             }
         }
     }
 
     public void onClickStay() {
-        game.getMe().endHand();
+        interactor.endHand(game, game.getMe());
     }
 
+    /**
+     * Очищаем все подписки и сохраняем данные, когда вызовется метод жизненного цикла
+     * сигнализирующий об остановке приложения
+     */
     public void onDestroy() {
         settings.edit()
                 .putLong("getMyMoney", game.getMe().getMoney())
                 .apply();
+        disposable.dispose();
     }
 }
