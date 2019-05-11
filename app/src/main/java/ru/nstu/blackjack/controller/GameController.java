@@ -91,7 +91,9 @@ public class GameController {
                 .map(PlayerState::getStatus)
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::showGameStatus);
+                .subscribe(status -> {
+                    view.showGameStatus(status, game);
+                });
 
         disposables = new ArrayList<>();
         disposable = new CompositeDisposable(dealerHands, monies, playerHands, bets, statuses);

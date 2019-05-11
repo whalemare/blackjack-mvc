@@ -1,4 +1,4 @@
-package ru.nstu.blackjack.views;
+package ru.nstu.blackjack.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
