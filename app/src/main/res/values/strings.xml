@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Blackjack</string>
+
+    <string name="play_button">Play</string>
+    <string name="title_activity_game">GameActivity</string>
+    <string name="dealer_text">Dealer\'s hand:</string>
+    <string name="card_hint">A playing card</string>
+    <string name="dealer_first_card_hint">The dealer\'s first card</string>
+    <string name="dealer_second_card_hint">The dealer\'s second card</string>
+    <string name="player_text">Your hand:</string>
+    <string name="player_first_card_hint">Your first card</string>
+    <string name="player_second_card_hint">Your second card</string>
+    <string name="your_money">$%d</string>
+    <string name="decrement_bet">- $%d</string>
+    <string name="initial_decrement_bet">- $100</string>
+    <string name="zero_dollars">$0</string>
+    <string name="current_bet">$%d</string>
+    <string name="increment_bet">+ $%d</string>
+    <string name="initial_increment_bet">+ $100</string>
+    <string name="bet">Bet</string>
+    <string name="stay">Stay</string>
+    <string name="your_bet_label">Your bet:</string>
+    <string name="hit">Hit</string>
+    <string name="doubleBet">Double</string>
+    <string name="split">Split</string>
+    <string name="play_again">Play Again</string>
+    <string name="player_busts">Too many! You lost $%d.</string>
+    <string name="player_wins">You won $%d!</string>
+    <string name="player_blackjack">Blackjack! You won $%d!</string>
+    <string name="dealer_blackjack">You lost $%d.</string>
+    <string name="dealer_busts">Dealer busts! You won $%d!</string>
+    <string name="dealer_wins">You lost $%d.</string>
+    <string name="push">It\'s a push. You get your bet back.</string>
+    <string name="dealer_initial_score">0</string>
+    <string name="player_initial_score">0</string>
+    <string name="your_money_label">"Your money: "</string>
+    <string name="main_activity_logo_description">app logo</string>
+    <string name="waiting">Waiting for all split hands to finish.</string>
+    <string name="hand_outcome_error">Sorry, there was some kind of error :(</string>
+</resources>
