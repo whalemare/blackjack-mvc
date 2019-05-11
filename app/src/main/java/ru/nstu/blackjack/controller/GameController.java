@@ -33,7 +33,7 @@ public class GameController {
     private CompositeDisposable disposable;
     private final GameInteractor interactor = new GameInteractor();
 
-    private long pendingBet = 100;
+    private long pendingBet = 0;
 
     public GameController(GameActivity view) {
         this.view = view;
